@@ -12,3 +12,8 @@ class Position(models.Model):
 
 class Worker(AbstractUser):
     position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True, related_name="workers")
+
+
+class Team(models.Model):
+    name = models.CharField(max_length=50)
+    worker = models.ManyToManyField(Worker, related_name="team")
