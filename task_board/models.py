@@ -17,3 +17,8 @@ class Worker(AbstractUser):
 class Team(models.Model):
     name = models.CharField(max_length=50)
     worker = models.ManyToManyField(Worker, related_name="team")
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=100)
+    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True)
