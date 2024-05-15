@@ -2,12 +2,25 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class TaskType(models.Model):
     name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 class Position(models.Model):
     name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 class Worker(AbstractUser):
@@ -49,3 +62,4 @@ class Task(models.Model):
     priority = models.CharField(max_length=1, choices=PriorityChoices.choices)
     task_type = models.ForeignKey(TaskType, on_delete=models.SET_NULL, null=True, related_name="tasks")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="tasks")
+    tags = models.ManyToManyField(Tag, related_name="tasks")
