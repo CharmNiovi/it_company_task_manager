@@ -46,7 +46,7 @@ class TeamWorker(models.Model):
 
 class Project(models.Model):
     name = models.CharField(max_length=100)
-    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True)
+    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, related_name="project")
 
 
 class Task(models.Model):
