@@ -20,8 +20,8 @@ class Team(models.Model):
 
 
 class TeamWorker(models.Model):
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
-    worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="team_worker")
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, related_name="team_worker")
     team_owner = models.BooleanField()
     team_staff = models.BooleanField()
 
