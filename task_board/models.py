@@ -22,3 +22,18 @@ class Team(models.Model):
 class Project(models.Model):
     name = models.CharField(max_length=100)
     team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True)
+
+
+class Task(models.Model):
+    class PriorityChoices(models.TextChoices):
+        LOW = ("L", "Low Priority")
+        MID = ("M", "Mid Priority")
+        High = ("H", "High Priority")
+
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    deadline = models.DateTimeField()
+    is_completed = models.BooleanField()
+    priority = models.CharField(max_length=1, choices=PriorityChoices.choices)
+    task_type = models.ForeignKey(TaskType, on_delete=models.SET_NULL, null=True, related_name="tasks")
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="tasks")
