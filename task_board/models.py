@@ -16,7 +16,19 @@ class Worker(AbstractUser):
 
 class Team(models.Model):
     name = models.CharField(max_length=50)
-    worker = models.ManyToManyField(Worker, related_name="team")
+    worker = models.ManyToManyField(Worker, through="TeamWorker")
+
+
+class TeamWorker(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
+    team_owner = models.BooleanField()
+    team_staff = models.BooleanField()
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(fields=("team", "team_owner"), name="unique_team_owner"),
+        )
 
 
 class Project(models.Model):
