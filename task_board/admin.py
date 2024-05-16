@@ -30,3 +30,11 @@ class TeamAdmin(admin.ModelAdmin):
     )
     inlines = (TeamWorkerInline,)
 
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ("name", "team")
+    search_fields = ("name", "team__name")
+    fieldsets = (
+        ("Info", {"fields": ("name", "team")}),
+    )
