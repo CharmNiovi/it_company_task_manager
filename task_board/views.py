@@ -72,3 +72,15 @@ class TaskDetailView(UserInTeamRequiredMixin, generic.DetailView):
         context["is_owner"] = team_worker.team_owner
         context["is_staff"] = team_worker.team_staff
         return context
+
+
+class TaskUpdateView(TeamStaffOrOwnerRequiredMixin, generic.UpdateView):
+    model = Task
+    fields = ('name', 'description', 'deadline', 'priority', 'task_type', 'tags', "is_completed")
+    template_name = 'task_board/project_form.html'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Task, project__pk=self.kwargs['pk'], pk=self.kwargs['task_pk'])
+
+    def get_success_url(self):
+        return reverse('task_board:project-detail', kwargs={'pk': self.object.project.pk})
