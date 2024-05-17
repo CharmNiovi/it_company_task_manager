@@ -101,3 +101,7 @@ class TeamListView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         return Team.objects.filter(team_workers__worker=self.request.user)
 
+
+class TeamDetailView(LoginRequiredMixin, generic.DetailView):
+    def get_object(self, queryset=None):
+        return get_object_or_404(Team, pk=self.kwargs['pk'])
