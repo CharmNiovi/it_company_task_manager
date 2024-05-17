@@ -23,3 +23,14 @@ class ProjectDetailView(LoginRequiredMixin, generic.DetailView):
         context["is_owner"] = team_worker.team_owner
         context["is_staff"] = team_worker.team_staff
         return context
+
+
+class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
+    form_class = ProjectForm
+    template_name = 'task_board/project_form.html'
+    success_url = reverse_lazy('task_board:project-list')
+
+    def get_form_kwargs(self):
+        kwargs = super(ProjectCreateView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
