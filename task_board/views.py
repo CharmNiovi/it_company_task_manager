@@ -47,3 +47,17 @@ class ProjectUpdateView(UserTeamOwnerRequiredMixin, generic.UpdateView):
 class ProjectDeleteView(UserTeamOwnerRequiredMixin, generic.DeleteView):
     model = Project
     success_url = reverse_lazy('task_board:project-list')
+
+
+class TaskCreateView(TeamStaffOrOwnerRequiredMixin, generic.CreateView):
+    model = Task
+    form_class = TaskForm
+    template_name = 'task_board/project_form.html'
+
+    def form_valid(self, form):
+        form.instance.project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        return super(TaskCreateView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('task_board:project-detail', kwargs={'pk': self.object.project.pk})
+
