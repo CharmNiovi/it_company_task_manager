@@ -34,3 +34,12 @@ class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
         kwargs = super(ProjectCreateView, self).get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
+
+
+class ProjectUpdateView(UserTeamOwnerRequiredMixin, generic.UpdateView):
+    model = Project
+    fields = ('name',)
+
+    def get_success_url(self):
+        return reverse('task_board:project-detail', kwargs={'pk': self.object.pk})
+
