@@ -20,22 +20,26 @@ class TeamWorkerBasedAccessMixin(AccessMixin):
 
 
 class UserInTeamProjectRequiredMixin(TeamWorkerBasedAccessMixin):
-    def filter_team_project_pk(self, user, **kwargs):
+    @staticmethod
+    def filter_team_project_pk(user, **kwargs):
         return user.filter(team__projects__pk=kwargs['pk'])
 
 
 class UserTeamOwnerRequiredMixin(UserInTeamProjectRequiredMixin):
-    def filter_team_owner(self, user, **kwargs):
+    @staticmethod
+    def filter_team_owner(user, **kwargs):
         return user.filter(team_owner=True)
 
 
 class TeamStaffOrOwnerRequiredMixin(UserInTeamProjectRequiredMixin):
-    def filter_team_owner_or_staff(self, user, **kwargs):
+    @staticmethod
+    def filter_team_owner_or_staff(user, **kwargs):
         return user.filter(Q(team_owner=True) | Q(team_staff=True))
 
 
 class UserInTeamTeamRequiredMixin(TeamWorkerBasedAccessMixin):
-    def filter_team_team_pk(self, user, **kwargs):
+    @staticmethod
+    def filter_team_team_pk(user, **kwargs):
         return user.filter(team__pk=kwargs['pk'])
 
 
