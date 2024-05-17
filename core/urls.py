@@ -21,6 +21,7 @@ from core import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('task_board.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
