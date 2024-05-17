@@ -84,3 +84,14 @@ class TaskUpdateView(TeamStaffOrOwnerRequiredMixin, generic.UpdateView):
 
     def get_success_url(self):
         return reverse('task_board:project-detail', kwargs={'pk': self.object.project.pk})
+
+
+class TaskDeleteView(TeamStaffOrOwnerRequiredMixin, generic.DeleteView):
+    model = Task
+    template_name = 'task_board/project_confirm_delete.html'
+
+    def get_success_url(self):
+        return reverse('task_board:project-detail', kwargs={'pk': self.object.project.pk})
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Task, project__pk=self.kwargs['pk'], pk=self.kwargs['task_pk'])
