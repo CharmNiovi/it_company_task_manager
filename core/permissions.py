@@ -1,24 +1,43 @@
 from django.db.models import Q
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
+from django.contrib.auth.mixins import AccessMixin
 
 
-class UserInTeamRequiredMixin(LoginRequiredMixin):
+class TeamWorkerBasedAccessMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.team_workers.filter(team__projects__pk=kwargs['pk']).exists():
-            raise Http404("You are not authorized to view this page")
+        filter_methods = self.get_all_filter()
+        user = request.user.team_workers
+
+        for method in filter_methods:
+            user = getattr(self, method)(user, **kwargs)
+
+        if not user.exists():
+            return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
-
-class UserTeamOwnerRequiredMixin(LoginRequiredMixin):
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.team_workers.filter(team_owner=True, team__projects__pk=kwargs['pk']).exists():
-            raise Http404("You are not authorized to view this page")
-        return super().dispatch(request, *args, **kwargs)
+    @classmethod
+    def get_all_filter(cls):
+        return [method for method in dir(cls) if callable(getattr(cls, method)) and method.startswith("filter_")]
 
 
-class TeamStaffOrOwnerRequiredMixin(LoginRequiredMixin):
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.team_workers.filter(Q(team_staff=True) | Q(team_owner=True), team__projects__pk=kwargs['pk']).exists():
-            raise Http404("You are not authorized to view this page")
-        return super().dispatch(request, *args, **kwargs)
+class UserInTeamProjectRequiredMixin(TeamWorkerBasedAccessMixin):
+    def filter_team_project_pk(self, user, **kwargs):
+        return user.filter(team__projects__pk=kwargs['pk'])
+
+
+class UserTeamOwnerRequiredMixin(UserInTeamProjectRequiredMixin):
+    def filter_team_owner(self, user, **kwargs):
+        return user.filter(team_owner=True)
+
+
+class TeamStaffOrOwnerRequiredMixin(UserInTeamProjectRequiredMixin):
+    def filter_team_owner_or_staff(self, user, **kwargs):
+        return user.filter(Q(team_owner=True) | Q(team_staff=True))
+
+
+class UserInTeamTeamRequiredMixin(TeamWorkerBasedAccessMixin):
+    def filter_team_team_pk(self, user, **kwargs):
+        return user.filter(team__pk=kwargs['pk'])
+
+
+class UserTeamOwnerTeamRequiredMixin(UserTeamOwnerRequiredMixin, UserInTeamTeamRequiredMixin):
+    pass
