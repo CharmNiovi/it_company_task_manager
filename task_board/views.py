@@ -61,3 +61,14 @@ class TaskCreateView(TeamStaffOrOwnerRequiredMixin, generic.CreateView):
     def get_success_url(self):
         return reverse('task_board:project-detail', kwargs={'pk': self.object.project.pk})
 
+
+class TaskDetailView(UserInTeamRequiredMixin, generic.DetailView):
+    def get_object(self, queryset=None):
+        return get_object_or_404(Task, project__pk=self.kwargs['pk'], pk=self.kwargs['task_pk'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        team_worker = TeamWorker.objects.get(team__projects__pk=self.kwargs['pk'], worker=self.request.user)
+        context["is_owner"] = team_worker.team_owner
+        context["is_staff"] = team_worker.team_staff
+        return context
