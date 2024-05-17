@@ -5,27 +5,20 @@ from django.http import Http404
 
 class UserInTeamRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
-        if not self.check_authorization(request, **kwargs):
+        if not request.user.team_workers.filter(team__projects__pk=kwargs['pk']).exists():
             raise Http404("You are not authorized to view this page")
         return super().dispatch(request, *args, **kwargs)
 
-    def check_authorization(self, request, **kwargs):
-        if request.user.is_anonymous:
-            return False
-        return request.user.team_workers.filter(
-                team__projects__pk=kwargs['pk']
-        ).exists()
+
+class UserTeamOwnerRequiredMixin(LoginRequiredMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.team_workers.filter(team_owner=True, team__projects__pk=kwargs['pk']).exists():
+            raise Http404("You are not authorized to view this page")
+        return super().dispatch(request, *args, **kwargs)
 
 
-class UserTeamOwnerRequiredMixin(UserInTeamRequiredMixin):
-    def check_authorization(self, request, **kwargs):
-        if request.user.is_anonymous:
-            return False
-        return request.user.team_workers.filter(team_owner=True).exists()
-
-
-class UserTeamStaffRequiredMixin(UserInTeamRequiredMixin):
-    def check_authorization(self, request, **kwargs):
-        if request.user.is_anonymous:
-            return False
-        return request.user.team_workers.filter(team_staff=True).exists()
+class TeamStaffOrOwnerRequiredMixin(LoginRequiredMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.team_workers.filter(Q(team_staff=True) | Q(team_owner=True), team__projects__pk=kwargs['pk']).exists():
+            raise Http404("You are not authorized to view this page")
+        return super().dispatch(request, *args, **kwargs)
