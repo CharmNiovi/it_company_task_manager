@@ -95,3 +95,9 @@ class TaskDeleteView(TeamStaffOrOwnerRequiredMixin, generic.DeleteView):
 
     def get_object(self, queryset=None):
         return get_object_or_404(Task, project__pk=self.kwargs['pk'], pk=self.kwargs['task_pk'])
+
+
+class TeamListView(LoginRequiredMixin, generic.ListView):
+    def get_queryset(self):
+        return Team.objects.filter(team_workers__worker=self.request.user)
+
