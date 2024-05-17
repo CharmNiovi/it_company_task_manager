@@ -43,3 +43,7 @@ class ProjectUpdateView(UserTeamOwnerRequiredMixin, generic.UpdateView):
     def get_success_url(self):
         return reverse('task_board:project-detail', kwargs={'pk': self.object.pk})
 
+
+class ProjectDeleteView(UserTeamOwnerRequiredMixin, generic.DeleteView):
+    model = Project
+    success_url = reverse_lazy('task_board:project-list')
