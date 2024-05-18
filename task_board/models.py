@@ -44,13 +44,14 @@ class TeamWorker(models.Model):
     team_staff = models.BooleanField(default=False)
 
     def clean(self) -> None:
-        if self.team_owner and TeamWorker.objects.filter(team=self.team, team_owner=True).exclude(worker_id=self.worker_id).first():
+        if self.team_owner and TeamWorker.objects.filter(team=self.team, team_owner=True).exclude(worker_id=self.worker_id).exists():
             raise ValidationError("Team owner must be one")
 
     class Meta:
         constraints = (
             models.UniqueConstraint(fields=("team", "worker"), name="unique_worker_in_team"),
         )
+        ordering = ("-team_owner", "-team_staff")
 
 
 class Project(models.Model):
@@ -62,6 +63,12 @@ class Project(models.Model):
 
 
 class Task(models.Model):
+    class StatusChoices(models.TextChoices):
+        UA = ("UA", "Unassigned")
+        IP = ("IP", "In Progress")
+        IR = ("IR", "In Review")
+        D = ("D", "Done")
+
     class PriorityChoices(models.TextChoices):
         LOW = ("L", "Low Priority")
         MID = ("M", "Mid Priority")
@@ -75,6 +82,8 @@ class Task(models.Model):
     task_type = models.ForeignKey(TaskType, on_delete=models.SET_NULL, null=True, related_name="tasks")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="tasks")
     tags = models.ManyToManyField(Tag, related_name="tasks")
+    status = models.CharField(max_length=2, choices=StatusChoices.choices)
+    assignees = models.ManyToManyField(get_user_model(), related_name="tasks", blank=True)
 
     def __str__(self):
         return self.name
