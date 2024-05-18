@@ -17,7 +17,7 @@ class ProjectForm(forms.ModelForm):
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ["name", "description", "deadline", "priority", "task_type", "tags"]
+        fields = ["name", "description", "deadline", "priority", "task_type", "tags", "assignees"]
 
 
 class TeamUpdateForm(forms.ModelForm):
