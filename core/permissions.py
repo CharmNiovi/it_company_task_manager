@@ -1,13 +1,12 @@
-from django.db.models import Q
 from django.contrib.auth.mixins import AccessMixin
+from django.db.models import Q
 
 
 class TeamWorkerBasedAccessMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
-        filter_methods = self.get_all_filter()
         user = request.user.team_workers
 
-        for method in filter_methods:
+        for method in self.get_all_filter():
             user = getattr(self, method)(user, **kwargs)
 
         if not user.exists():
@@ -25,7 +24,7 @@ class UserInTeamProjectRequiredMixin(TeamWorkerBasedAccessMixin):
         return user.filter(team__projects__pk=kwargs['pk'])
 
 
-class UserTeamOwnerRequiredMixin(UserInTeamProjectRequiredMixin):
+class UserTeamOwnerRequiredMixin(TeamWorkerBasedAccessMixin):
     @staticmethod
     def filter_team_owner(user, **kwargs):
         return user.filter(team_owner=True)
@@ -41,6 +40,10 @@ class UserInTeamTeamRequiredMixin(TeamWorkerBasedAccessMixin):
     @staticmethod
     def filter_team_team_pk(user, **kwargs):
         return user.filter(team__pk=kwargs['pk'])
+
+
+class UserTeamOwnerProjectRequiredMixin(UserTeamOwnerRequiredMixin, UserInTeamProjectRequiredMixin):
+    pass
 
 
 class UserTeamOwnerTeamRequiredMixin(UserTeamOwnerRequiredMixin, UserInTeamTeamRequiredMixin):
