@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+  <p>{{ object.name }}</p>
+  <p>{{ object.description }}</p>
+  <p>{{ object.deadline }}</p>
+  <p>{{ object.is_completed }}</p>
+  <p>{{ object.priority }}</p>
+  <p>{{ object.task_type.name }}</p>
+  <p>{{ object.get_status_display }}</p>
+  {% for assign_user in object.assignees.all %}
+    <p>{{ assign_user.username }}</p>
+  {% endfor %}
+  <ul>
+    {% for tag in object.tags.all %}
+      <li>{{ tag }}</li>
+    {% endfor %}
+  </ul>
+  {% if is_staff or is_owner %}
+    <a href="{% url 'task_board:task-update' object.project.pk object.pk %}">
+      <button>Upd</button>
+    </a>
+    <a href="{% url 'task_board:task-delete' object.project.pk object.pk %}">
+      <button>Del</button>
+    </a>
+  {% endif %}
+{% endblock %}

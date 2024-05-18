@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  {% if is_owner %}
+    <a href="{% url 'task_board:project-update' object.pk %}">
+      <button class="btn btn-primary mr-1">Update project</button>
+    </a>
+    <a href="{% url 'task_board:project-delete' object.pk %}">
+      <button class="btn btn-danger ml-1">Delete project</button>
+    </a>
+  {% endif %}
+  {% if is_owner or is_staff %}
+    <p>
+      <a href="{% url 'task_board:task-create' object.pk %}">
+        <button class="btn btn-primary mt-2">Create Task</button>
+      </a>
+    </p>
+  {% endif %}
+  <p>{{ object.name }}</p>
+  <p>{{ object.team.name }}</p>
+  <ul>
+    Task
+    {% for task in object.tasks.all %}
+      {% if not task.is_completed %}
+        <li>
+          <p>{{ task.name }}</p>
+          <p>{{ task.deadline }}</p>
+          <p>{{ task.get_priority_display }}</p>
+          <p>{{ task.task_type }}</p>
+        <p>{{ task.get_status_display }}</p>
+        {% for assign_user in task.assignees.all %}
+          <p>{{ assign_user.username }}</p>
+        {% endfor %}
+          <p>Tag:</p>
+          <ul>
+            {% for tag in task.tags.all %}
+              <li>{{ tag.name }}</li>
+            {% endfor %}
+          </ul>
+          <a href="{% url 'task_board:task-detail' object.pk task.pk %}">
+            <button>Detail</button>
+          </a>
+          {% if is_staff or is_owner %}
+            <a href="{% url 'task_board:task-update' object.pk task.pk %}">
+              <button>Upd</button>
+            </a>
+            <a href="{% url 'task_board:task-delete' object.pk task.pk %}">
+              <button>Del</button>
+            </a>
+          {% endif %}
+        </li>
+      {% endif %}
+      <br>
+    {% endfor %}
+
+    Completed Task:
+    {% for task in object.tasks.all %}
+      {% if task.is_completed %}
+        <li>
+          <p>{{ task.name }}</p>
+          <p>{{ task.deadline }}</p>
+          <p>{{ task.get_priority_display }}</p>
+          <p>{{ task.task_type }}</p>
+          <p>Tag:</p>
+          <ul>
+            {% for tag in task.tags.all %}
+              <li>{{ tag.name }}</li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% if is_staff or is_owner %}
+          <a href="{% url 'task_board:task-update' object.pk task.pk %}">
+            <button>Upd</button>
+          </a>
+          <a href="{% url 'task_board:task-delete' object.pk task.pk %}">
+            <button>Del</button>
+          </a>
+        {% endif %}
+      {% endif %}
+      <br>
+    {% endfor %}
+  </ul>
+{% endblock %}

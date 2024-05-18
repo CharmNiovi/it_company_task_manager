@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>{{ object.name }}</h2>
+  {% if is_owner %}
+    <a href="{% url 'task_board:add-team-worker-in-team' object.pk %}">
+      <button>Add user</button>
+    </a>
+  {% endif %}
+  {% for team_worker in team_workers %}
+    <p>
+      {{ team_worker.worker.username }}
+      {% if team_worker.team_owner %}
+        (owner)
+      {% elif team_worker.team_staff %}
+        (staff)
+      {% endif %}
+      {% if is_owner %}
+        <a href="{% url 'task_board:change-team-worker-permission' object.pk team_worker.worker.username %}">
+          <button>Change</button>
+        </a>
+        <a href="{% url 'task_board:delete-user-from-team' object.pk team_worker.worker.username %}">
+          <button>Delete</button>
+        </a>
+      {% endif %}
+    </p>
+  {% endfor %}
+{% endblock %}
