@@ -12,10 +12,12 @@ from task_board.views import (
     TaskDeleteView,
     TeamListView,
     TeamDetailView,
+    AddTeamWorkerInTeamView,
+    ChangeTeamWorkerIsStaffPermissionView
 )
 
 urlpatterns = [
-    path("", ProjectListView.as_view(), name="project-list"),
+    path("projects/", ProjectListView.as_view(), name="project-list"),
     path("project/create/", ProjectCreateView.as_view(), name="project-create"),
     path("project/<int:pk>/", ProjectDetailView.as_view(), name="project-detail"),
     path("project/<int:pk>/update/", ProjectUpdateView.as_view(), name="project-update"),
@@ -28,6 +30,8 @@ urlpatterns = [
 
     path("teams/", TeamListView.as_view(), name="team-list"),
     path("team/<int:pk>/", TeamDetailView.as_view(), name="team-detail"),
+    path("team/<int:pk>/add_user/", AddTeamWorkerInTeamView.as_view(), name="add-team-worker-in-team"),
+    path("team/<int:pk>/change_permission_in_<str:slug>/", ChangeTeamWorkerIsStaffPermissionView.as_view(), name="change-team-worker-permission"),
 ]
 
 app_name = "task_board"
