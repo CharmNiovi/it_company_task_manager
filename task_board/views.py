@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 
-from core.permissions import UserInTeamProjectRequiredMixin, UserTeamOwnerRequiredMixin, TeamStaffOrOwnerRequiredMixin, UserInTeamTeamRequiredMixin, UserTeamOwnerTeamRequiredMixin, UserTeamOwnerProjectRequiredMixin
+from core.permissions import UserInTeamProjectRequiredMixin, TeamStaffOrOwnerRequiredMixin, UserInTeamTeamRequiredMixin, UserTeamOwnerTeamRequiredMixin, UserTeamOwnerProjectRequiredMixin
 from task_board.forms import ProjectForm, TaskForm, TeamUpdateForm
 from task_board.models import Project, Task, TeamWorker, Team
 
@@ -140,3 +140,32 @@ class ChangeTeamWorkerIsStaffPermissionView(LoginRequiredMixin, UserTeamOwnerTea
 
     def get_object(self, queryset=None):
         return get_object_or_404(TeamWorker, team__pk=self.kwargs['pk'], worker__username=self.kwargs['slug'])
+
+
+class UserDeleteFromTeamView(LoginRequiredMixin, UserTeamOwnerTeamRequiredMixin, generic.DeleteView):
+    model = TeamWorker
+    template_name = 'task_board/project_confirm_delete.html'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(TeamWorker, team__pk=self.kwargs['pk'], worker__username=self.kwargs['slug'])
+
+    def get_success_url(self):
+        return reverse('task_board:team-detail', kwargs={'pk': self.kwargs['pk']})
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.object.team_owner:
+            team_workers = TeamWorker.objects.filter(team=self.object.team)
+            if team_workers.exists():
+                team_staff = team_workers.filter(team_staff=True)
+                if team_staff:
+                    team_staff_first = team_staff.first()
+                    team_staff_first.team_owner = True
+                    team_staff_first.save()
+                else:
+                    team_workers_first = team_workers.first()
+                    team_workers_first.team_owner = True
+                    team_workers_first.save()
+            else:
+                self.object.team.delete()
+        return response
