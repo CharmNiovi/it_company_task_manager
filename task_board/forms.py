@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import get_user_model
 
 from task_board.models import Project, Team, Task
 
@@ -17,3 +18,9 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ["name", "description", "deadline", "priority", "task_type", "tags"]
+
+
+class TeamUpdateForm(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ("email",)
