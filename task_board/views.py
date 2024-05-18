@@ -1,10 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 
-from core.permissions import UserTeamOwnerRequiredMixin, TeamStaffOrOwnerRequiredMixin, UserInTeamRequiredMixin
-from task_board.forms import ProjectForm, TaskForm
+from core.permissions import UserInTeamProjectRequiredMixin, UserTeamOwnerRequiredMixin, TeamStaffOrOwnerRequiredMixin, UserInTeamTeamRequiredMixin, UserTeamOwnerTeamRequiredMixin, UserTeamOwnerProjectRequiredMixin
+from task_board.forms import ProjectForm, TaskForm, TeamUpdateForm
 from task_board.models import Project, Task, TeamWorker, Team
 
 
@@ -36,7 +37,7 @@ class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
         return kwargs
 
 
-class ProjectUpdateView(UserTeamOwnerRequiredMixin, generic.UpdateView):
+class ProjectUpdateView(LoginRequiredMixin, UserTeamOwnerProjectRequiredMixin, generic.UpdateView):
     model = Project
     fields = ('name',)
 
@@ -44,12 +45,12 @@ class ProjectUpdateView(UserTeamOwnerRequiredMixin, generic.UpdateView):
         return reverse('task_board:project-detail', kwargs={'pk': self.object.pk})
 
 
-class ProjectDeleteView(UserTeamOwnerRequiredMixin, generic.DeleteView):
+class ProjectDeleteView(LoginRequiredMixin, UserTeamOwnerProjectRequiredMixin, generic.DeleteView):
     model = Project
     success_url = reverse_lazy('task_board:project-list')
 
 
-class TaskCreateView(TeamStaffOrOwnerRequiredMixin, generic.CreateView):
+class TaskCreateView(LoginRequiredMixin, TeamStaffOrOwnerRequiredMixin, generic.CreateView):
     model = Task
     form_class = TaskForm
     template_name = 'task_board/project_form.html'
@@ -62,7 +63,7 @@ class TaskCreateView(TeamStaffOrOwnerRequiredMixin, generic.CreateView):
         return reverse('task_board:project-detail', kwargs={'pk': self.object.project.pk})
 
 
-class TaskDetailView(UserInTeamRequiredMixin, generic.DetailView):
+class TaskDetailView(LoginRequiredMixin, UserInTeamProjectRequiredMixin, generic.DetailView):
     def get_object(self, queryset=None):
         return get_object_or_404(Task, project__pk=self.kwargs['pk'], pk=self.kwargs['task_pk'])
 
@@ -74,7 +75,7 @@ class TaskDetailView(UserInTeamRequiredMixin, generic.DetailView):
         return context
 
 
-class TaskUpdateView(TeamStaffOrOwnerRequiredMixin, generic.UpdateView):
+class TaskUpdateView(LoginRequiredMixin, TeamStaffOrOwnerRequiredMixin, generic.UpdateView):
     model = Task
     fields = ('name', 'description', 'deadline', 'priority', 'task_type', 'tags', "is_completed")
     template_name = 'task_board/project_form.html'
@@ -86,7 +87,7 @@ class TaskUpdateView(TeamStaffOrOwnerRequiredMixin, generic.UpdateView):
         return reverse('task_board:project-detail', kwargs={'pk': self.object.project.pk})
 
 
-class TaskDeleteView(TeamStaffOrOwnerRequiredMixin, generic.DeleteView):
+class TaskDeleteView(LoginRequiredMixin, TeamStaffOrOwnerRequiredMixin, generic.DeleteView):
     model = Task
     template_name = 'task_board/project_confirm_delete.html'
 
@@ -99,9 +100,17 @@ class TaskDeleteView(TeamStaffOrOwnerRequiredMixin, generic.DeleteView):
 
 class TeamListView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
-        return Team.objects.filter(team_workers__worker=self.request.user)
+        return Team.objects.filter(team_workers__worker=self.request.user).values("pk", "name", "team_workers__team_owner", "team_workers__team_staff")
 
 
-class TeamDetailView(LoginRequiredMixin, generic.DetailView):
+class TeamDetailView(LoginRequiredMixin, UserInTeamTeamRequiredMixin, generic.DetailView):
+    template_name = 'task_board/team_detail.html'
+
     def get_object(self, queryset=None):
         return get_object_or_404(Team, pk=self.kwargs['pk'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["team_workers"] = TeamWorker.objects.filter(team=context["object"])
+        context["is_owner"] = context["team_workers"].get(team=context["object"], worker=self.request.user).team_owner
+        return context
