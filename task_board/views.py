@@ -128,3 +128,15 @@ class AddTeamWorkerInTeamView(LoginRequiredMixin, UserTeamOwnerTeamRequiredMixin
         team = get_object_or_404(Team, pk=self.kwargs['pk'])
         TeamWorker.objects.create(team=team, worker=user_to_add)
         return super(AddTeamWorkerInTeamView, self).form_valid(form)
+
+
+class ChangeTeamWorkerIsStaffPermissionView(LoginRequiredMixin, UserTeamOwnerTeamRequiredMixin, generic.UpdateView):
+    model = TeamWorker
+    fields = ('team_staff',)
+    template_name = 'task_board/project_form.html'
+
+    def get_success_url(self):
+        return reverse('task_board:team-detail', kwargs={'pk': self.kwargs['pk']})
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(TeamWorker, team__pk=self.kwargs['pk'], worker__username=self.kwargs['slug'])
