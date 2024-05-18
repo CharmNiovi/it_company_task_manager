@@ -114,3 +114,17 @@ class TeamDetailView(LoginRequiredMixin, UserInTeamTeamRequiredMixin, generic.De
         context["team_workers"] = TeamWorker.objects.filter(team=context["object"])
         context["is_owner"] = context["team_workers"].get(team=context["object"], worker=self.request.user).team_owner
         return context
+
+
+class AddTeamWorkerInTeamView(LoginRequiredMixin, UserTeamOwnerTeamRequiredMixin, generic.FormView):
+    form_class = TeamUpdateForm
+    template_name = 'task_board/project_form.html'
+
+    def get_success_url(self):
+        return reverse('task_board:team-detail', kwargs={'pk': self.kwargs['pk']})
+
+    def form_valid(self, form):
+        user_to_add = get_object_or_404(get_user_model(), email=form.cleaned_data["email"])
+        team = get_object_or_404(Team, pk=self.kwargs['pk'])
+        TeamWorker.objects.create(team=team, worker=user_to_add)
+        return super(AddTeamWorkerInTeamView, self).form_valid(form)
