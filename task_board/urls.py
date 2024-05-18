@@ -12,6 +12,7 @@ from task_board.views import (
     TaskDeleteView,
     TeamListView,
     TeamDetailView,
+    TeamCreateView,
     AddTeamWorkerInTeamView,
     ChangeTeamWorkerIsStaffPermissionView,
     UserDeleteFromTeamView
@@ -30,6 +31,7 @@ urlpatterns = [
     path("project/<int:pk>/task/<int:task_pk>/delete/", TaskDeleteView.as_view(), name="task-delete"),
 
     path("teams/", TeamListView.as_view(), name="team-list"),
+    path("team/create/", TeamCreateView.as_view(), name="team-create"),
     path("team/<int:pk>/", TeamDetailView.as_view(), name="team-detail"),
     path("team/<int:pk>/add_user/", AddTeamWorkerInTeamView.as_view(), name="add-team-worker-in-team"),
     path("team/<int:pk>/change_permission_in_<str:slug>/", ChangeTeamWorkerIsStaffPermissionView.as_view(), name="change-team-worker-permission"),

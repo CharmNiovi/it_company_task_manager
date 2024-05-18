@@ -4,7 +4,8 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 
-from core.permissions import UserInTeamProjectRequiredMixin, TeamStaffOrOwnerRequiredMixin, UserInTeamTeamRequiredMixin, UserTeamOwnerTeamRequiredMixin, UserTeamOwnerProjectRequiredMixin
+from core.permissions import UserInTeamProjectRequiredMixin, TeamStaffOrOwnerRequiredMixin, UserInTeamTeamRequiredMixin, \
+    UserTeamOwnerTeamRequiredMixin, UserTeamOwnerProjectRequiredMixin
 from task_board.forms import ProjectForm, TaskForm, TeamUpdateForm
 from task_board.models import Project, Task, TeamWorker, Team
 
@@ -29,7 +30,9 @@ class ProjectDetailView(LoginRequiredMixin, generic.DetailView):
 class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = ProjectForm
     template_name = 'task_board/project_form.html'
-    success_url = reverse_lazy('task_board:project-list')
+
+    def get_success_url(self):
+        return reverse('task_board:project-detail', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
         kwargs = super(ProjectCreateView, self).get_form_kwargs()
@@ -57,6 +60,7 @@ class TaskCreateView(LoginRequiredMixin, TeamStaffOrOwnerRequiredMixin, generic.
 
     def form_valid(self, form):
         form.instance.project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        form.instance.status = "IP" if form.cleaned_data.get("assignees") else "UA"
         return super(TaskCreateView, self).form_valid(form)
 
     def get_success_url(self):
@@ -77,7 +81,7 @@ class TaskDetailView(LoginRequiredMixin, UserInTeamProjectRequiredMixin, generic
 
 class TaskUpdateView(LoginRequiredMixin, TeamStaffOrOwnerRequiredMixin, generic.UpdateView):
     model = Task
-    fields = ('name', 'description', 'deadline', 'priority', 'task_type', 'tags', "is_completed")
+    fields = ('name', 'description', 'deadline', 'priority', 'task_type', 'tags', "is_completed", "status", "assignees")
     template_name = 'task_board/project_form.html'
 
     def get_object(self, queryset=None):
@@ -101,6 +105,20 @@ class TaskDeleteView(LoginRequiredMixin, TeamStaffOrOwnerRequiredMixin, generic.
 class TeamListView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         return Team.objects.filter(team_workers__worker=self.request.user).values("pk", "name", "team_workers__team_owner", "team_workers__team_staff")
+
+
+class TeamCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Team
+    fields = ('name', )
+    template_name = 'task_board/project_form.html'
+
+    def get_success_url(self):
+        return reverse('task_board:team-detail', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        TeamWorker.objects.create(team=self.object, worker=self.request.user, team_owner=True)
+        return response
 
 
 class TeamDetailView(LoginRequiredMixin, UserInTeamTeamRequiredMixin, generic.DetailView):
