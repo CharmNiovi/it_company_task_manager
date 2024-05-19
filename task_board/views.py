@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 
-from core.permissions import UserInTeamProjectRequiredMixin, TeamStaffOrOwnerRequiredMixin, UserInTeamTeamRequiredMixin, \
+from task_board.permissions import UserInTeamProjectRequiredMixin, TeamStaffOrOwnerRequiredMixin, UserInTeamTeamRequiredMixin, \
     UserTeamOwnerTeamRequiredMixin, UserTeamOwnerProjectRequiredMixin
 from task_board.forms import ProjectForm, TaskForm, TeamUpdateForm
 from task_board.models import Project, Task, TeamWorker, Team
@@ -17,7 +17,7 @@ class ProjectListView(LoginRequiredMixin, generic.ListView):
 
 class ProjectDetailView(LoginRequiredMixin, generic.DetailView):
     def get_queryset(self):
-        return Project.objects.filter(team__worker=self.request.user).prefetch_related("tasks__tags", "tasks__task_type")
+        return Project.objects.filter(team__worker=self.request.user).prefetch_related("tasks__tags", "tasks__task_type", "tasks__assignees")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
