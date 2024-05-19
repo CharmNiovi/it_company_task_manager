@@ -336,3 +336,21 @@ class TeamCreateViewTestCase(TestCase):
         self.assertEqual(request.status_code, 200)
         self.assertEqual(Team.objects.all().count(), 1)
         self.assertTrue(TeamWorker.objects.get(team__name='New Team Name', worker__username='testuser').team_owner)
+
+
+class TeamDetailViewTestCase(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username="testuser", password="testpassword")
+        self.team = Team.objects.create(name="testteam")
+
+    def test_get_not_in_same_team(self):
+        user = get_user_model().objects.create_user(username='testuser1', password='testpassword')
+        TeamWorker.objects.create(team=self.team, worker=user)
+        request = self.client.get(reverse('task_board:team-detail', kwargs={'pk': self.team.pk}))
+        self.assertEqual(request.status_code, 404)
+
+    def test_get(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user)
+        request = self.client.get(reverse('task_board:team-detail', kwargs={'pk': self.team.pk}))
+        self.assertEqual(request.status_code, 200)
