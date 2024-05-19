@@ -425,3 +425,51 @@ class ChangeTeamWorkerIsStaffPermissionViewTestCase(TestCase):
         request = self.client.post(reverse('task_board:change-team-worker-permission', kwargs={'pk': self.team.pk, 'slug': self.user.username}), data, follow=True)
         self.assertEqual(request.status_code, 200)
         self.assertTrue(TeamWorker.objects.get(team=self.team, worker=self.user).team_staff)
+
+
+class UserDeleteFromTeamViewTestCase(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username="testuser", password="testpassword")
+        self.team = Team.objects.create(name="testteam")
+
+    def test_get_not_owner(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user)
+        request = self.client.get(reverse('task_board:delete-user-from-team', kwargs={'pk': self.team.pk, 'slug': self.user.username}))
+        self.assertEqual(request.status_code, 404)
+
+    def test_get_not_in_team(self):
+        user = get_user_model().objects.create_user(username='testuser1', password='testpassword')
+        TeamWorker.objects.create(team=self.team, worker=user)
+
+        request = self.client.get(reverse('task_board:delete-user-from-team', kwargs={'pk': self.team.pk, 'slug': self.user.username}))
+        self.assertEqual(request.status_code, 404)
+
+    def test_get(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
+        request = self.client.get(reverse('task_board:delete-user-from-team', kwargs={'pk': self.team.pk, 'slug': self.user.username}))
+        self.assertEqual(request.status_code, 200)
+
+    def test_delete_without_team_members(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
+
+        self.client.post(reverse('task_board:delete-user-from-team', kwargs={'pk': self.team.pk, 'slug': self.user.username}))
+        self.assertEqual(Team.objects.count(), 0)
+
+    def test_delete_with_team_staff_members(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
+        user = get_user_model().objects.create_user(username='testuser1', password='testpassword')
+        new_team_member = TeamWorker.objects.create(team=self.team, worker=user, team_staff=True)
+
+        self.client.post(reverse('task_board:delete-user-from-team', kwargs={'pk': self.team.pk, 'slug': self.user.username}))
+        self.assertEqual(Team.objects.count(), 1)
+        self.assertEqual(TeamWorker.objects.get(team=self.team, worker=user).pk, new_team_member.pk)
+
+    def test_delete_with_common_team_members(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
+        user = get_user_model().objects.create_user(username='testuser1', password='testpassword')
+        new_team_member = TeamWorker.objects.create(team=self.team, worker=user)
+
+        self.client.post(reverse('task_board:delete-user-from-team', kwargs={'pk': self.team.pk, 'slug': self.user.username}))
+        self.assertEqual(Team.objects.count(), 1)
+        self.assertEqual(TeamWorker.objects.get(team=self.team, worker=user).pk, new_team_member.pk)
