@@ -323,3 +323,16 @@ class TeamListViewTestCase(TestCase):
         self.client.login(username="testuser", password="testpassword")
         request = self.client.get(reverse('task_board:team-list'))
         self.assertEqual(request.status_code, 200)
+
+
+class TeamCreateViewTestCase(TestCase):
+    def test_post(self):
+        data = {
+            'name': 'New Team Name'
+        }
+        get_user_model().objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username="testuser", password="testpassword")
+        request = self.client.post(reverse('task_board:team-create'), data, follow=True)
+        self.assertEqual(request.status_code, 200)
+        self.assertEqual(Team.objects.all().count(), 1)
+        self.assertTrue(TeamWorker.objects.get(team__name='New Team Name', worker__username='testuser').team_owner)
