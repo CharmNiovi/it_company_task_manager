@@ -145,8 +145,8 @@ class ProjectDeleteViewTestCase(TestCase):
         response = self.client.post(reverse('task_board:project-delete', kwargs={'pk': self.project.pk}), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Project.objects.count(), 0)
-        
-        
+
+
 class TaskCreateViewTest(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username='testuser', password='testpassword')
@@ -199,3 +199,31 @@ class TaskCreateViewTest(TestCase):
 
         self.assertEqual(request.status_code, 200)
         self.assertEqual(Task.objects.count(), 1)
+        self.assertEqual(Task.objects.first().status, "UA")
+
+
+class TaskDetailViewTestCase(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username='testuser', password='testpassword')
+        self.team = Team.objects.create(name="testteam")
+        self.project = Project.objects.create(name="testproject", team=self.team)
+
+    def test_get_not_in_team(self):
+        user2 = get_user_model().objects.create_user(username='testuser1', password='testpassword')
+        TeamWorker.objects.create(team=self.team, worker=user2)
+        task = Task.objects.create(name="testtask", project=self.project, description='Test Description', deadline=datetime.datetime(2022, 2, 1), priority='L')
+
+        self.client.login(username="testuser", password="testpassword")
+        request = self.client.get(reverse('task_board:task-detail', kwargs={'pk': self.project.pk, "task_pk": task.pk}))
+
+        self.assertEqual(request.status_code, 404)
+
+    def test_get(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user)
+        task = Task.objects.create(name="testtask", project=self.project, description='Test Description',
+                                   deadline=datetime.datetime(2022, 2, 1), priority='L')
+
+        self.client.login(username="testuser", password="testpassword")
+        request = self.client.get(reverse('task_board:task-detail', kwargs={'pk': self.project.pk, "task_pk": task.pk}))
+
+        self.assertEqual(request.status_code, 200)
