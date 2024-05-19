@@ -1,6 +1,6 @@
-from django.contrib.auth import get_user_model
-
 from core.permissions import TeamWorkerBasedAccessMixin
+
+from django.contrib.auth import get_user_model
 
 
 class RequestedUserInSameTeamRequiredMixin(TeamWorkerBasedAccessMixin):

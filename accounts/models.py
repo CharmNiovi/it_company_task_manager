@@ -10,6 +10,11 @@ class Position(models.Model):
 
 
 class Worker(AbstractUser):
-    position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True, related_name="workers")
     profile_picture = models.ImageField(upload_to="profile_pictures", null=True, blank=True)
     email = models.EmailField(unique=True)
+    position = models.ForeignKey(
+        to=Position,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="workers"
+    )

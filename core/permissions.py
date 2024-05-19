@@ -1,5 +1,4 @@
 from django.contrib.auth.mixins import AccessMixin
-
 from django.http import Http404
 
 
@@ -16,4 +15,8 @@ class TeamWorkerBasedAccessMixin(AccessMixin):
 
     @classmethod
     def get_all_filter(cls):
-        return [method for method in dir(cls) if callable(getattr(cls, method)) and method.startswith("filter_")]
+        return [
+            method
+            for method in dir(cls)
+            if callable(getattr(cls, method)) and method.startswith("filter_")
+        ]

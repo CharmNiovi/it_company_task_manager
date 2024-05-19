@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from task_board.models import TaskType, Team, TeamWorker, Tag, Project, Task
+from task_board.models import Project, Tag, Task, TaskType, Team, TeamWorker
 
 
 admin.site.register(Tag)
