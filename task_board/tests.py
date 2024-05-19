@@ -314,3 +314,12 @@ class TaskDeleteViewTestCase(TestCase):
         request = self.client.post(reverse('task_board:task-delete', kwargs={'pk': self.project.pk, 'task_pk': self.task.pk}), follow=True)
         self.assertEqual(request.status_code, 200)
         self.assertEqual(Task.objects.all().count(), 0)
+
+
+class TeamListViewTestCase(TestCase):
+
+    def test_get(self):
+        get_user_model().objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username="testuser", password="testpassword")
+        request = self.client.get(reverse('task_board:team-list'))
+        self.assertEqual(request.status_code, 200)
