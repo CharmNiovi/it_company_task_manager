@@ -152,35 +152,30 @@ class TaskCreateViewTest(TestCase):
         self.user = get_user_model().objects.create_user(username='testuser', password='testpassword')
         self.team = Team.objects.create(name="testteam")
         self.project = Project.objects.create(name="testproject", team=self.team)
+        self.client.login(username="testuser", password="testpassword")
 
     def test_get_not_in_team(self):
         user2 = get_user_model().objects.create_user(username='testuser1', password='testpassword')
         TeamWorker.objects.create(team=self.team, worker=user2)
 
-        self.client.login(username="testuser", password="testpassword")
         request = self.client.get(reverse('task_board:task-create', kwargs={'pk': self.project.pk}))
-
         self.assertEqual(request.status_code, 404)
 
     def test_get_without_status(self):
         TeamWorker.objects.create(team=self.team, worker=self.user)
 
-        self.client.login(username="testuser", password="testpassword")
         request = self.client.get(reverse('task_board:task-create', kwargs={'pk': self.project.pk}))
-
         self.assertEqual(request.status_code, 404)
 
     def test_get_with_owner_status(self):
         TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
 
-        self.client.login(username="testuser", password="testpassword")
         request = self.client.get(reverse('task_board:task-create', kwargs={'pk': self.project.pk}))
         self.assertEqual(request.status_code, 200)
 
     def test_get_with_staff_status(self):
         TeamWorker.objects.create(team=self.team, worker=self.user, team_staff=True)
 
-        self.client.login(username="testuser", password="testpassword")
         request = self.client.get(reverse('task_board:task-create', kwargs={'pk': self.project.pk}))
         self.assertEqual(request.status_code, 200)
 
@@ -191,10 +186,8 @@ class TaskCreateViewTest(TestCase):
             'deadline': datetime.datetime(2022, 2, 1),
             'priority': 'L',
         }
-
         TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
 
-        self.client.login(username="testuser", password="testpassword")
         request = self.client.post(reverse('task_board:task-create', kwargs={'pk': self.project.pk}), data, follow=True)
 
         self.assertEqual(request.status_code, 200)
@@ -207,24 +200,22 @@ class TaskDetailViewTestCase(TestCase):
         self.user = get_user_model().objects.create_user(username='testuser', password='testpassword')
         self.team = Team.objects.create(name="testteam")
         self.project = Project.objects.create(name="testproject", team=self.team)
+        self.task = Task.objects.create(name="testtask", project=self.project, description='Test Description',
+                                   deadline=datetime.datetime(2022, 2, 1), priority='L').pk
+        self.client.login(username="testuser", password="testpassword")
 
     def test_get_not_in_team(self):
         user2 = get_user_model().objects.create_user(username='testuser1', password='testpassword')
         TeamWorker.objects.create(team=self.team, worker=user2)
-        task = Task.objects.create(name="testtask", project=self.project, description='Test Description', deadline=datetime.datetime(2022, 2, 1), priority='L')
 
-        self.client.login(username="testuser", password="testpassword")
-        request = self.client.get(reverse('task_board:task-detail', kwargs={'pk': self.project.pk, "task_pk": task.pk}))
+        request = self.client.get(reverse('task_board:task-detail', kwargs={'pk': self.project.pk, "task_pk": self.task}))
 
         self.assertEqual(request.status_code, 404)
 
     def test_get(self):
         TeamWorker.objects.create(team=self.team, worker=self.user)
-        task = Task.objects.create(name="testtask", project=self.project, description='Test Description',
-                                   deadline=datetime.datetime(2022, 2, 1), priority='L')
 
-        self.client.login(username="testuser", password="testpassword")
-        request = self.client.get(reverse('task_board:task-detail', kwargs={'pk': self.project.pk, "task_pk": task.pk}))
+        request = self.client.get(reverse('task_board:task-detail', kwargs={'pk': self.project.pk, "task_pk": self.task}))
 
         self.assertEqual(request.status_code, 200)
 
@@ -235,12 +226,11 @@ class TaskUpdateViewTestCase(TestCase):
         self.team = Team.objects.create(name='TestTeam')
         self.project = Project.objects.create(name='TestProject', team=self.team)
         self.task = Task.objects.create(name="testtask", project=self.project, description='Test Description', deadline=datetime.datetime(2022, 2, 1), priority='L')
-
+        self.client.login(username="testuser", password="testpassword")
     def test_get_not_in_team(self):
         user2 = get_user_model().objects.create_user(username='testuser1', password='testpassword')
         TeamWorker.objects.create(team=self.team, worker=user2)
 
-        self.client.login(username="testuser", password="testpassword")
         request = self.client.get(reverse('task_board:task-update', kwargs={'pk': self.project.pk, 'task_pk': self.task.pk}))
 
         self.assertEqual(request.status_code, 404)
@@ -249,7 +239,6 @@ class TaskUpdateViewTestCase(TestCase):
         user2 = get_user_model().objects.create_user(username='testuser1', password='testpassword')
         TeamWorker.objects.create(team=self.team, worker=user2)
 
-        self.client.login(username="testuser", password="testpassword")
         request = self.client.get(reverse('task_board:task-update', kwargs={'pk': self.project.pk, 'task_pk': self.task.pk}))
 
         self.assertEqual(request.status_code, 404)
@@ -257,14 +246,12 @@ class TaskUpdateViewTestCase(TestCase):
     def test_get_with_owner_status(self):
         TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
 
-        self.client.login(username="testuser", password="testpassword")
         request = self.client.get(reverse('task_board:task-update', kwargs={'pk': self.project.pk, 'task_pk': self.task.pk}))
         self.assertEqual(request.status_code, 200)
 
     def test_get_with_staff_status(self):
         TeamWorker.objects.create(team=self.team, worker=self.user, team_staff=True)
 
-        self.client.login(username="testuser", password="testpassword")
         request = self.client.get(reverse('task_board:task-update', kwargs={'pk': self.project.pk, 'task_pk': self.task.pk}))
         self.assertEqual(request.status_code, 200)
 
@@ -280,7 +267,50 @@ class TaskUpdateViewTestCase(TestCase):
 
         TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
 
-        self.client.login(username="testuser", password="testpassword")
         request = self.client.post(reverse("task_board:task-update", kwargs={'pk': self.project.pk, 'task_pk': self.task.pk}), data, follow=True)
         self.assertEqual(request.status_code, 200)
         self.assertEqual(Task.objects.get(pk=self.task.pk).name, 'New Task Name')
+
+
+class TaskDeleteViewTestCase(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username='testuser', password='testpassword')
+        self.team = Team.objects.create(name='TestTeam')
+        self.project = Project.objects.create(name='TestProject', team=self.team)
+        self.task = Task.objects.create(name="testtask", project=self.project, description='Test Description', deadline=datetime.datetime(2022, 2, 1), priority='L')
+        self.client.login(username="testuser", password="testpassword")
+
+    def test_get_not_in_team(self):
+        user2 = get_user_model().objects.create_user(username='testuser1', password='testpassword')
+        TeamWorker.objects.create(team=self.team, worker=user2)
+
+        request = self.client.get(reverse('task_board:task-delete', kwargs={'pk': self.project.pk, 'task_pk': self.task.pk}))
+
+        self.assertEqual(request.status_code, 404)
+
+    def test_get_without_status(self):
+        user2 = get_user_model().objects.create_user(username='testuser1', password='testpassword')
+        TeamWorker.objects.create(team=self.team, worker=user2)
+
+        request = self.client.get(reverse('task_board:task-delete', kwargs={'pk': self.project.pk, 'task_pk': self.task.pk}))
+
+        self.assertEqual(request.status_code, 404)
+
+    def test_get_with_owner_status(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
+
+        request = self.client.get(reverse('task_board:task-delete', kwargs={'pk': self.project.pk, 'task_pk': self.task.pk}))
+        self.assertEqual(request.status_code, 200)
+
+    def test_get_with_staff_status(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user, team_staff=True)
+
+        request = self.client.get(reverse('task_board:task-delete', kwargs={'pk': self.project.pk, 'task_pk': self.task.pk}))
+        self.assertEqual(request.status_code, 200)
+
+    def test_project_delete_view_post(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
+
+        request = self.client.post(reverse('task_board:task-delete', kwargs={'pk': self.project.pk, 'task_pk': self.task.pk}), follow=True)
+        self.assertEqual(request.status_code, 200)
+        self.assertEqual(Task.objects.all().count(), 0)
