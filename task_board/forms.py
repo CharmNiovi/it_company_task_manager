@@ -20,7 +20,5 @@ class TaskForm(forms.ModelForm):
         fields = ["name", "description", "deadline", "priority", "task_type", "tags", "assignees"]
 
 
-class TeamUpdateForm(forms.ModelForm):
-    class Meta:
-        model = get_user_model()
-        fields = ("email",)
+class TeamUpdateForm(forms.Form):
+    email = forms.EmailField()
