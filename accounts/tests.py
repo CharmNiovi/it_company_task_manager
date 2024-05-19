@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
 from django.test import TestCase
 import datetime
+from accounts.models import Position
 from accounts.forms import RegisterForm
 from task_board.models import Team, TeamWorker, Task, Project
 
@@ -70,3 +71,22 @@ class ProfileViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+
+class ProfileUpdateViewTestCase(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username="testuser", password="testpassword")
+
+    def test_form_valid(self):
+        data = {
+            'username': 'testuser2',
+            'first_name': 'Updated Test',
+            'last_name': 'Updated User',
+            'email': 'updatedtestuser@example.com',
+            'position': Position.objects.create(name="Tester").id,
+            'profile_picture': '',
+        }
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.post(reverse("accounts:profile-update"), data, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(get_user_model().objects.filter(**data).exists())
