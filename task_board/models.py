@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser
+
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -18,20 +18,9 @@ class TaskType(models.Model):
         return self.name
 
 
-class Position(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class Worker(AbstractUser):
-    position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True, related_name="workers")
-
-
 class Team(models.Model):
     name = models.CharField(max_length=50)
-    worker = models.ManyToManyField(get_user_model(), through="TeamWorker")
+    worker = models.ManyToManyField(get_user_model(), through="TeamWorker", related_name="teams")
 
     def __str__(self):
         return self.name
