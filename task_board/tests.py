@@ -354,3 +354,39 @@ class TeamDetailViewTestCase(TestCase):
         TeamWorker.objects.create(team=self.team, worker=self.user)
         request = self.client.get(reverse('task_board:team-detail', kwargs={'pk': self.team.pk}))
         self.assertEqual(request.status_code, 200)
+
+
+class AddTeamWorkerInTeamViewTestCase(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username="testuser", password="testpassword")
+        self.team = Team.objects.create(name="testteam")
+
+    def test_get_not_owner(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user)
+
+        request = self.client.get(reverse('task_board:add-team-worker-in-team', kwargs={'pk': self.team.pk}))
+        self.assertEqual(request.status_code, 404)
+
+    def test_get_not_in_team(self):
+        user = get_user_model().objects.create_user(username='testuser1', password='testpassword')
+        TeamWorker.objects.create(team=self.team, worker=user)
+
+        request = self.client.get(reverse('task_board:add-team-worker-in-team', kwargs={'pk': self.team.pk}))
+        self.assertEqual(request.status_code, 404)
+
+    def test_get(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
+
+        request = self.client.get(reverse('task_board:add-team-worker-in-team', kwargs={'pk': self.team.pk}))
+        self.assertEqual(request.status_code, 200)
+
+    def test_post(self):
+        TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
+        user = get_user_model().objects.create_user(username='testuser1', password='testpassword',
+                                             email="testuser1@example.com")
+        data = {'email': user.email}
+
+        request = self.client.post(reverse('task_board:add-team-worker-in-team', kwargs={'pk': self.team.pk}), data, follow=True)
+        self.assertEqual(request.status_code, 200)
+        self.assertEqual(TeamWorker.objects.filter(team=self.team).count(), 2)
