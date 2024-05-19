@@ -1,19 +1,10 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 
-from task_board.models import TaskType, Position, Worker, Team, TeamWorker, Tag, Project, Task
+from task_board.models import TaskType, Team, TeamWorker, Tag, Project, Task
 
 
 admin.site.register(Tag)
 admin.site.register(TaskType)
-admin.site.register(Position)
-
-
-@admin.register(Worker)
-class WorkerAdmin(UserAdmin):
-    fieldsets = UserAdmin.fieldsets
-    fieldsets[1][1]['fields'] += ('position',)
-    list_filter = UserAdmin.list_filter + ("position",)
 
 
 class TeamWorkerInline(admin.TabularInline):
@@ -46,7 +37,7 @@ class TaskAdmin(admin.ModelAdmin):
         ("General info", {"fields": ("name", "description")}),
         ("Tags", {"fields": ("tags",)}),
         ("Time info", {"fields": ("priority", "deadline", "is_completed")}),
-        ("Specific info", {"fields": ("task_type", "project")})
+        ("Specific info", {"fields": ("task_type", "project", "status", "assignees")}),
     )
     list_display = ("name", "deadline", "is_completed", "priority", "task_type", "project")
     search_fields = ("name", "priority", "task_type")
