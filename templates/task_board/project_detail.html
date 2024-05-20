@@ -16,68 +16,370 @@
       </a>
     </p>
   {% endif %}
-  <p>{{ object.name }}</p>
-  <p>{{ object.team.name }}</p>
-  <ul>
-    Task
-    {% for task in object.tasks.all %}
-      {% if not task.is_completed %}
-        <li>
-          <p>{{ task.name }}</p>
-          <p>{{ task.deadline }}</p>
-          <p>{{ task.get_priority_display }}</p>
-          <p>{{ task.task_type }}</p>
-        <p>{{ task.get_status_display }}</p>
-        {% for assign_user in task.assignees.all %}
-          <p>{{ assign_user.username }}</p>
-        {% endfor %}
-          <p>Tag:</p>
-          <ul>
-            {% for tag in task.tags.all %}
-              <li>{{ tag.name }}</li>
-            {% endfor %}
-          </ul>
-          <a href="{% url 'task_board:task-detail' object.pk task.pk %}">
-            <button>Detail</button>
-          </a>
-          {% if is_staff or is_owner %}
-            <a href="{% url 'task_board:task-update' object.pk task.pk %}">
-              <button>Upd</button>
-            </a>
-            <a href="{% url 'task_board:task-delete' object.pk task.pk %}">
-              <button>Del</button>
-            </a>
-          {% endif %}
-        </li>
-      {% endif %}
-      <br>
-    {% endfor %}
+  <p>{{ object.name }} by {{ object.team.name }}</p>
+  <style>/* ! tailwindcss v3.4.3 | MIT License | https://tailwindcss.com */
 
-    Completed Task:
-    {% for task in object.tasks.all %}
-      {% if task.is_completed %}
-        <li>
-          <p>{{ task.name }}</p>
-          <p>{{ task.deadline }}</p>
-          <p>{{ task.get_priority_display }}</p>
-          <p>{{ task.task_type }}</p>
-          <p>Tag:</p>
-          <ul>
-            {% for tag in task.tags.all %}
-              <li>{{ tag.name }}</li>
-            {% endfor %}
-          </ul>
-        </li>
-        {% if is_staff or is_owner %}
-          <a href="{% url 'task_board:task-update' object.pk task.pk %}">
-            <button>Upd</button>
-          </a>
-          <a href="{% url 'task_board:task-delete' object.pk task.pk %}">
-            <button>Del</button>
-          </a>
-        {% endif %}
-      {% endif %}
-      <br>
-    {% endfor %}
-  </ul>
+  menu, ol, ul {
+      list-style: none;
+      margin: 0;
+      padding: 0
+  }
+
+  .absolute {
+      position: absolute
+  }
+
+  .relative {
+      position: relative
+  }
+
+  .bottom-0 {
+      bottom: 0px
+  }
+
+  .right-0 {
+      right: 0px
+  }
+
+
+  .mx-3 {
+      margin-left: 0.75rem;
+      margin-right: 0.75rem
+  }
+
+  .-mb-6 {
+      margin-bottom: -1.5rem
+  }
+
+  .mb-3 {
+      margin-bottom: 0.75rem
+  }
+
+  .mr-3 {
+      margin-right: 0.75rem
+  }
+
+  .mt-3 {
+      margin-top: 0.75rem
+  }
+
+  .block {
+      display: block
+  }
+
+  .flex {
+      display: flex
+  }
+
+
+  .h-screen {
+      height: 100vh
+  }
+
+  .w-2 {
+      width: 0.5rem
+  }
+
+  .w-64 {
+      width: 16rem
+  }
+
+  .flex-grow {
+      flex-grow: 1
+  }
+
+  .flex-col {
+      flex-direction: column
+  }
+
+  .bg-blue-500 {
+      --tw-bg-opacity: 1;
+      background-color: rgb(59 130 246 / var(--tw-bg-opacity))
+  }
+
+  .bg-gray-100 {
+      --tw-bg-opacity: 1;
+      background-color: rgb(243 244 246 / var(--tw-bg-opacity))
+  }
+
+  .bg-gray-200 {
+      --tw-bg-opacity: 1;
+      background-color: rgb(229 231 235 / var(--tw-bg-opacity))
+  }
+
+  .bg-indigo-500 {
+      --tw-bg-opacity: 1;
+      background-color: rgb(99 102 241 / var(--tw-bg-opacity))
+  }
+
+  .bg-orange-500 {
+      --tw-bg-opacity: 1;
+      background-color: rgb(249 115 22 / var(--tw-bg-opacity))
+  }
+
+  .bg-red-500 {
+      --tw-bg-opacity: 1;
+      background-color: rgb(239 68 68 / var(--tw-bg-opacity))
+  }
+
+  .bg-white {
+      --tw-bg-opacity: 1;
+      background-color: rgb(255 255 255 / var(--tw-bg-opacity))
+  }
+
+  .bg-checker {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E"),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0))
+  }
+
+  .bg-1 {
+      background-size: 1rem
+  }
+
+  .p-2 {
+      padding: 0.5rem
+  }
+
+  .px-6 {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem
+  }
+
+  .py-1 {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem
+  }
+
+  .py-2 {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem
+  }
+
+  .py-3 {
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem
+  }
+
+  .pb-2 {
+      padding-bottom: 0.5rem
+  }
+
+  .pt-3 {
+      padding-top: 0.75rem
+  }
+
+  .pt-6 {
+      padding-top: 1.5rem
+  }
+
+  .font-sans {
+      font-family: "Kulim Park"
+  }
+
+  .text-2xl {
+      font-size: 1.5rem;
+      line-height: 2rem
+  }
+
+  .text-xs {
+      font-size: 0.75rem;
+      line-height: 1rem
+  }
+
+  .font-bold {
+      font-weight: 700
+  }
+
+
+  .leading-snug {
+      line-height: 1.375
+  }
+
+  .text-gray-700 {
+      --tw-text-opacity: 1;
+      color: rgb(55 65 81 / var(--tw-text-opacity))
+  }
+
+  .text-gray-900 {
+      --tw-text-opacity: 1;
+      color: rgb(17 24 39 / var(--tw-text-opacity))
+  }
+
+  .text-white {
+      --tw-text-opacity: 1;
+      color: rgb(255 255 255 / var(--tw-text-opacity))
+  }
+
+  .antialiased {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale
+  }
+
+  .opacity-75 {
+      opacity: 0.75
+  }
+
+  .shadow {
+      --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+      box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+  }
+
+  .shadow-md {
+      --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+      box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+  }
+
+  .hover\:shadow:hover {
+      --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+      box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+  }
+
+  .group:hover .group-hover\:block {
+      display: block
+  }
+  </style>
+  <div class="antialiased bg-gray-100 grid font-sans h-screen leading-snug">
+    <div class="main flex overflow-x-auto px-6 py-3">
+      <div class="flex flex-col flex-shrink-0 mr-3 push-right-6 relative w-64">
+        <div class="bg-red-500 bg-checker bg-top-left bg-1 flex items-center -mb-6 mx-3 pb-2 pt-3 px-3 relative rounded shadow z-20">
+          <h4 class="font-bold font-heading text-2xl text-white">Unassigned Tasks</h4>
+        </div>
+        <ul class="bg-white flex-grow px-3 pt-6 mt-3 overflow-y-auto rounded shadow-md">
+          {% for task in tasks %}
+            {% if task.status == "UA" %}
+              <li class="mb-3"><a class="bg-gray-100 block group relative rounded hover:shadow"
+                                  href='{% url 'task_board:task-detail' object.pk task.pk %}'>
+                <div class="flex items-stretch p-2">
+                  <div class="bg-red-500 mr-3 opacity-75 rounded w-2"></div>
+                  <p class="mr-3 py-2 text-gray-900">
+                    {{ task.name }}
+                    <br>
+                    {{ task.deadline }}
+                    <br>
+                    {{ task.get_priority_display }}
+                    <br>
+                    {{ task.task_type.name }}
+                    <br>
+                    {% for tag in task.tags.all %}
+                      <span style="background-color: lightgray">{{ tag }}</span>
+                    {% endfor %}
+                  </p>
+                </div>
+                <div class="absolute bg-gray-200 bottom-0 group-hover:block hidden py-1 px-2 right-0 rounded-br rounded-tl text-gray-700 text-xs">
+                  ☰
+                </div>
+              </a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="flex flex-col flex-shrink-0 mr-3 push-right-6 relative w-64">
+        <div class="bg-orange-500 bg-checker bg-top-left bg-1 flex items-center -mb-6 mx-3 pb-2 pt-3 px-3 relative rounded shadow z-20">
+          <h4 class="font-bold font-heading text-2xl text-white">In Progress Tasks</h4>
+        </div>
+        <ul class="bg-white flex-grow px-3 pt-6 mt-3 overflow-y-auto rounded shadow-md">
+          {% for task in tasks %}
+            {% if task.status == "IP" %}
+              <li class="mb-3"><a class="bg-gray-100 block group relative rounded hover:shadow"
+                                  href="{% url 'task_board:task-detail' object.pk task.pk %}">
+                <div class="flex items-stretch p-2">
+                  <div class="bg-orange-500 mr-3 opacity-75 rounded w-2"></div>
+                  <p class="mr-3 py-2 text-gray-900">
+                    {{ task.name }}
+                    <br>
+                    {{ task.deadline }}
+                    <br>
+                    {{ task.get_priority_display }}
+                    <br>
+                    {{ task.task_type.name }}
+                    <br>
+                    {% for tag in task.tags.all %}
+                      <span style="background-color: lightgray">{{ tag }}</span>
+                    {% endfor %}
+                    <br>
+                    Assignees: {% for assigner in task.assignees.all %} {{ assigner }} {% endfor %}
+                  </p>
+                </div>
+                <div class="absolute bg-gray-200 bottom-0 group-hover:block hidden py-1 px-2 right-0 rounded-br rounded-tl text-gray-700 text-xs">
+                  ☰
+                </div>
+              </a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="flex flex-col flex-shrink-0 mr-3 push-right-6 relative w-64">
+        <div class="bg-blue-500 bg-checker bg-top-left bg-1 flex items-center -mb-6 mx-3 pb-2 pt-3 px-3 relative rounded shadow z-20">
+          <h4 class="font-bold font-heading text-2xl text-white">In Review Tasks</h4>
+        </div>
+        <ul class="bg-white flex-grow px-3 pt-6 mt-3 overflow-y-auto rounded shadow-md">
+          {% for task in tasks %}
+            {% if task.status == "IR" %}
+              <li class="mb-3"><a class="bg-gray-100 block group relative rounded hover:shadow"
+                                  href="{% url 'task_board:task-detail' object.pk task.pk %}">
+                <div class="flex items-stretch p-2">
+                  <div class="bg-blue-500 mr-3 opacity-75 rounded w-2"></div>
+                  <p class="mr-3 py-2 text-gray-900">
+                    {{ task.name }}
+                    <br>
+                    {{ task.deadline }}
+                    <br>
+                    {{ task.get_priority_display }}
+                    <br>
+                    {{ task.task_type.name }}
+                    <br>
+                    {% for tag in task.tags.all %}
+                      <span style="background-color: lightgray">{{ tag }}</span>
+                    {% endfor %}
+                    <br>
+                    Assignees: {% for assigner in task.assignees.all %} {{ assigner }} {% endfor %}
+                  </p>
+                </div>
+                <div class="absolute bg-gray-200 bottom-0 group-hover:block hidden py-1 px-2 right-0 rounded-br rounded-tl text-gray-700 text-xs">
+                  ☰
+                </div>
+              </a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="flex flex-col flex-shrink-0 mr-3 push-right-6 relative w-64">
+        <div class="bg-indigo-500 bg-checker bg-top-left bg-1 flex items-center -mb-6 mx-3 pb-2 pt-3 px-3 relative rounded shadow z-20">
+          <h4 class="font-bold font-heading text-2xl text-white">Done Tasks</h4>
+        </div>
+        <ul class="bg-white flex-grow px-3 pt-6 mt-3 overflow-y-auto rounded shadow-md">
+          {% for task in tasks %}
+            {% if task.status == "D" %}
+              <li class="mb-3"><a class="bg-gray-100 block group relative rounded hover:shadow"
+                                  href="{% url 'task_board:task-detail' object.pk task.pk %}">
+                <div class="flex items-stretch p-2">
+                  <div class="bg-indigo-500 mr-3 opacity-75 rounded w-2"></div>
+                  <p class="mr-3 py-2 text-gray-900">
+                    {{ task.name }}
+                    <br>
+                    {{ task.deadline }}
+                    <br>
+                    {{ task.get_priority_display }}
+                    <br>
+                    {{ task.task_type.name }}
+                    <br>
+                    {% for tag in task.tags.all %}
+                      <span style="background-color: lightgray">{{ tag }}</span>
+                    {% endfor %}
+                    Assignees: {% for assigner in task.assignees.all %} {{ assigner }} {% endfor %}
+                  </p>
+                </div>
+                <div class="absolute bg-gray-200 bottom-0 group-hover:block hidden py-1 px-2 right-0 rounded-br rounded-tl text-gray-700 text-xs">
+                  ☰
+                </div>
+              </a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
 {% endblock %}
