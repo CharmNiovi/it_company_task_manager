@@ -56,7 +56,7 @@ urlpatterns = [
         name="change-team-worker-permission"
     ),
     path(
-        "team/<int:pk>/change_permission_in_<str:slug>/delete/",
+        "team/<int:pk>/delete_<str:slug>/",
         UserDeleteFromTeamView.as_view(),
         name="delete-user-from-team"
     ),
