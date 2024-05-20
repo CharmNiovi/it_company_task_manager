@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>Delete Project?</h2>
+  <h2>Delete Project "{{ object.name }}"?</h2>
   <form method="post">
   {% csrf_token %}
   <input type="submit" value="accept" class="btn btn-danger">
