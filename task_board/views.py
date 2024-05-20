@@ -203,7 +203,10 @@ class AddTeamWorkerInTeamView(LoginRequiredMixin,
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["object"] = get_object_or_404(Team.objects.values("name"), pk=self.kwargs["pk"])
+        context["object"] = get_object_or_404(
+            Team.objects.values("name"),
+            pk=self.kwargs["pk"]
+        )
         return context
 
     def form_valid(self, form):
