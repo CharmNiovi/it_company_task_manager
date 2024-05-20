@@ -77,7 +77,7 @@ class ProjectDeleteView(LoginRequiredMixin,
 class TaskCreateView(LoginRequiredMixin, TeamStaffOrOwnerRequiredMixin, generic.CreateView):
     model = Task
     form_class = TaskForm
-    template_name = "task_board/project_form.html"
+    template_name = "task_board/task_form.html"
 
     def form_valid(self, form):
         form.instance.project = get_object_or_404(Project, pk=self.kwargs["pk"])
@@ -119,7 +119,7 @@ class TaskUpdateView(LoginRequiredMixin, TeamStaffOrOwnerRequiredMixin, generic.
         "status",
         "assignees"
     )
-    template_name = "task_board/project_form.html"
+    template_name = "task_board/task_form.html"
 
     def get_object(self, queryset=None):
         return get_object_or_404(
@@ -134,7 +134,7 @@ class TaskUpdateView(LoginRequiredMixin, TeamStaffOrOwnerRequiredMixin, generic.
 
 class TaskDeleteView(LoginRequiredMixin, TeamStaffOrOwnerRequiredMixin, generic.DeleteView):
     model = Task
-    template_name = "task_board/project_confirm_delete.html"
+    template_name = "task_board/task_confirm_delete.html"
 
     def get_success_url(self):
         return reverse("task_board:project-detail", kwargs={"pk": self.object.project.pk})
@@ -159,7 +159,7 @@ class TeamListView(LoginRequiredMixin, generic.ListView):
 class TeamCreateView(LoginRequiredMixin, generic.CreateView):
     model = Team
     fields = ("name", )
-    template_name = "task_board/project_form.html"
+    template_name = "task_board/team_form.html"
 
     def get_success_url(self):
         return reverse("task_board:team-detail", kwargs={"pk": self.object.pk})
@@ -196,10 +196,15 @@ class AddTeamWorkerInTeamView(LoginRequiredMixin,
                               UserTeamOwnerTeamRequiredMixin,
                               generic.FormView):
     form_class = TeamUpdateForm
-    template_name = "task_board/project_form.html"
+    template_name = "task_board/team_form.html"
 
     def get_success_url(self):
         return reverse("task_board:team-detail", kwargs={"pk": self.kwargs["pk"]})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["object"] = get_object_or_404(Team.objects.values("name"), pk=self.kwargs["pk"])
+        return context
 
     def form_valid(self, form):
         user_to_add = get_object_or_404(get_user_model(), email=form.cleaned_data["email"])
@@ -213,7 +218,7 @@ class ChangeTeamWorkerIsStaffPermissionView(LoginRequiredMixin,
                                             generic.UpdateView):
     model = TeamWorker
     fields = ("team_staff",)
-    template_name = "task_board/project_form.html"
+    template_name = "task_board/change_permission_in_team_form.html"
 
     def get_success_url(self):
         return reverse("task_board:team-detail", kwargs={"pk": self.kwargs["pk"]})
@@ -230,7 +235,7 @@ class UserDeleteFromTeamView(LoginRequiredMixin,
                              UserTeamOwnerTeamRequiredMixin,
                              generic.DeleteView):
     model = TeamWorker
-    template_name = "task_board/project_confirm_delete.html"
+    template_name = "task_board/team_confirm_delete.html"
 
     def get_object(self, queryset=None):
         return get_object_or_404(
