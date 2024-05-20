@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-  <a href="{% url 'task_board:team-create' %}"><button>Create team</button></a>
+  <a href="{% url 'task_board:team-create' %}"><button class="btn btn-primary">Create team</button></a>
   <ul>
     {% for team in object_list %}
       <li>

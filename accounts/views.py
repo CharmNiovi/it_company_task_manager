@@ -35,8 +35,8 @@ class ProfileView(
         context["tasks"] = (
             context["object"].tasks
             .exclude(status="D")
-            .select_related("project")
-            .order_by("deadline")[:10]
+            .order_by("deadline")
+            .select_related("project", "task_type")[:10]
         )
         return context
 
