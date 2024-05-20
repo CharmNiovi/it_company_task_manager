@@ -24,8 +24,6 @@ class ProjectDetailView(LoginRequiredMixin, generic.DetailView):
     def get_queryset(self):
         return Project.objects.filter(
             team__worker=self.request.user
-        ).prefetch_related(
-            "tasks__tags", "tasks__task_type", "tasks__assignees"
         )
 
     def get_context_data(self, **kwargs):
@@ -36,6 +34,13 @@ class ProjectDetailView(LoginRequiredMixin, generic.DetailView):
         )
         context["is_owner"] = team_worker.team_owner
         context["is_staff"] = team_worker.team_staff
+        context["tasks"] = context["object"].tasks.order_by(
+            "deadline", "-priority"
+        ).select_related(
+            "task_type"
+        ).prefetch_related(
+            "tags", "assignees"
+        )
         return context
 
 
@@ -111,7 +116,6 @@ class TaskUpdateView(LoginRequiredMixin, TeamStaffOrOwnerRequiredMixin, generic.
         "priority",
         "task_type",
         "tags",
-        "is_completed",
         "status",
         "assignees"
     )

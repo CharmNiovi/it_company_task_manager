@@ -10,7 +10,8 @@ from task_board.models import Project, Task, Team, TeamWorker
 class ProjectListViewTestCase(TestCase):
     def setUp(self):
         user = get_user_model().objects.create_user(username="testuser",
-                                                    password="testpassword")
+                                                    password="testpassword",
+                                                    email="test@example.com")
         team = Team.objects.create(name="Test Team")
         TeamWorker.objects.create(team=team, worker=user, team_owner=True)
         Project.objects.create(name="Test Project 1", team=team)
@@ -31,7 +32,8 @@ class ProjectDetailViewTestCase(TestCase):
 
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="testuser",
-                                                         password="testpassword")
+                                                         password="testpassword",
+                                                         email="test@example.com")
         self.team = Team.objects.create(name="testteam")
         self.team_worker = TeamWorker.objects.create(team=self.team,
                                                      worker=self.user,
@@ -60,7 +62,8 @@ class ProjectDetailViewTestCase(TestCase):
 class ProjectCreateViewTestCase(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="testuser",
-                                                         password="testpassword")
+                                                         password="testpassword",
+                                                         email="test@example.com")
         self.client.login(username="testuser", password="testpassword")
 
     def test_get_with_team(self):
@@ -94,7 +97,8 @@ class ProjectUpdateViewTestCase(TestCase):
 
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="testuser",
-                                                         password="testpassword")
+                                                         password="testpassword",
+                                                         email="test@example.com")
 
     def test_project_update_view_get_not_owner(self):
         team = Team.objects.create(name="testteam")
@@ -112,7 +116,8 @@ class ProjectUpdateViewTestCase(TestCase):
     def test_project_update_view_get_not_in_team(self):
         team = Team.objects.create(name="testteam")
         user2 = get_user_model().objects.create_user(username="testuser1",
-                                                     password="testpassword")
+                                                     password="testpassword",
+                                                     email="test1@example.com")
         TeamWorker.objects.create(team=team, worker=user2)
         project = Project.objects.create(name="testproject", team=team)
 
@@ -147,7 +152,8 @@ class ProjectUpdateViewTestCase(TestCase):
 class ProjectDeleteViewTestCase(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="testuser",
-                                                         password="testpassword")
+                                                         password="testpassword",
+                                                         email="test@example.com")
         self.team = Team.objects.create(name="testteam")
         TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
         self.project = Project.objects.create(name="testproject", team=self.team)
@@ -155,7 +161,8 @@ class ProjectDeleteViewTestCase(TestCase):
     def test_project_delete_view_get_not_owner(self):
         self.client.login(username="testuser", password="testpassword")
         user2 = get_user_model().objects.create_user(username="testuser2",
-                                                     password="testpassword")
+                                                     password="testpassword",
+                                                     email="test1@example.com")
         self.client.force_login(user2)
         response = self.client.get(reverse(
             "task_board:project-delete",
@@ -166,7 +173,8 @@ class ProjectDeleteViewTestCase(TestCase):
     def test_project_delete_view_get_not_in_team(self):
         self.client.login(username="testuser", password="testpassword")
         user2 = get_user_model().objects.create_user(username="testuser2",
-                                                     password="testpassword")
+                                                     password="testpassword",
+                                                     email="test1@example.com")
         TeamWorker.objects.create(team=self.team, worker=user2)
         self.client.force_login(user2)
         response = self.client.get(reverse(
@@ -191,14 +199,16 @@ class ProjectDeleteViewTestCase(TestCase):
 class TaskCreateViewTest(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="testuser",
-                                                         password="testpassword")
+                                                         password="testpassword",
+                                                         email="test@example.com")
         self.team = Team.objects.create(name="testteam")
         self.project = Project.objects.create(name="testproject", team=self.team)
         self.client.login(username="testuser", password="testpassword")
 
     def test_get_not_in_team(self):
         user2 = get_user_model().objects.create_user(username="testuser1",
-                                                     password="testpassword")
+                                                     password="testpassword",
+                                                     email="test1@example.com")
         TeamWorker.objects.create(team=self.team, worker=user2)
 
         request = self.client.get(reverse(
@@ -239,7 +249,7 @@ class TaskCreateViewTest(TestCase):
             "name": "Test Task",
             "description": "Test Description",
             "deadline": datetime.datetime(2022, 2, 1),
-            "priority": "L",
+            "priority": "1",
         }
         TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
 
@@ -258,7 +268,8 @@ class TaskCreateViewTest(TestCase):
 class TaskDetailViewTestCase(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="testuser",
-                                                         password="testpassword")
+                                                         password="testpassword",
+                                                         email="test@example.com")
         self.team = Team.objects.create(name="testteam")
         self.project = Project.objects.create(name="testproject", team=self.team)
         self.task = Task.objects.create(
@@ -272,7 +283,8 @@ class TaskDetailViewTestCase(TestCase):
 
     def test_get_not_in_team(self):
         user2 = get_user_model().objects.create_user(username="testuser1",
-                                                     password="testpassword")
+                                                     password="testpassword",
+                                                     email="test1@example.com")
         TeamWorker.objects.create(team=self.team, worker=user2)
 
         request = self.client.get(reverse(
@@ -296,21 +308,23 @@ class TaskDetailViewTestCase(TestCase):
 class TaskUpdateViewTestCase(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="testuser",
-                                                         password="testpassword")
+                                                         password="testpassword",
+                                                         email="test@example.com")
         self.team = Team.objects.create(name="TestTeam")
         self.project = Project.objects.create(name="TestProject", team=self.team)
         self.task = Task.objects.create(
             name="testtask",
             project=self.project,
             description="Test Description",
-            priority="L",
+            priority="1",
             deadline=datetime.datetime(2022, 2, 1),
         )
         self.client.login(username="testuser", password="testpassword")
 
     def test_get_not_in_team(self):
         user2 = get_user_model().objects.create_user(username="testuser1",
-                                                     password="testpassword")
+                                                     password="testpassword",
+                                                     email="test1@example.com")
         TeamWorker.objects.create(team=self.team, worker=user2)
 
         request = self.client.get(reverse(
@@ -322,7 +336,8 @@ class TaskUpdateViewTestCase(TestCase):
 
     def test_get_without_status(self):
         user2 = get_user_model().objects.create_user(username="testuser1",
-                                                     password="testpassword")
+                                                     password="testpassword",
+                                                     email="test1@example.com")
         TeamWorker.objects.create(team=self.team, worker=user2)
 
         request = self.client.get(reverse(
@@ -356,7 +371,7 @@ class TaskUpdateViewTestCase(TestCase):
             "description": "New Task Description",
             "project": self.project.pk,
             "deadline": "2022-02-01",
-            "priority": "L",
+            "priority": "1",
             "status": "UA"
         }
 
@@ -378,21 +393,23 @@ class TaskUpdateViewTestCase(TestCase):
 class TaskDeleteViewTestCase(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="testuser",
-                                                         password="testpassword")
+                                                         password="testpassword",
+                                                         email="test@example.com")
         self.team = Team.objects.create(name="TestTeam")
         self.project = Project.objects.create(name="TestProject", team=self.team)
         self.task = Task.objects.create(
             name="testtask",
             project=self.project,
             description="Test Description",
-            priority="L",
+            priority="1",
             deadline=datetime.datetime(2022, 2, 1),
         )
         self.client.login(username="testuser", password="testpassword")
 
     def test_get_not_in_team(self):
         user2 = get_user_model().objects.create_user(username="testuser1",
-                                                     password="testpassword")
+                                                     password="testpassword",
+                                                     email="test1@example.com")
         TeamWorker.objects.create(team=self.team, worker=user2)
 
         request = self.client.get(reverse(
@@ -404,7 +421,8 @@ class TaskDeleteViewTestCase(TestCase):
 
     def test_get_without_status(self):
         user2 = get_user_model().objects.create_user(username="testuser1",
-                                                     password="testpassword")
+                                                     password="testpassword",
+                                                     email="test1@example.com")
         TeamWorker.objects.create(team=self.team, worker=user2)
 
         request = self.client.get(reverse(
@@ -452,7 +470,9 @@ class TaskDeleteViewTestCase(TestCase):
 class TeamListViewTestCase(TestCase):
 
     def test_get(self):
-        get_user_model().objects.create_user(username="testuser", password="testpassword")
+        get_user_model().objects.create_user(username="testuser",
+                                             password="testpassword",
+                                             email="test@example.com")
         self.client.login(username="testuser", password="testpassword")
         request = self.client.get(reverse("task_board:team-list"))
         self.assertEqual(request.status_code, 200)
@@ -463,7 +483,9 @@ class TeamCreateViewTestCase(TestCase):
         data = {
             "name": "New Team Name"
         }
-        get_user_model().objects.create_user(username="testuser", password="testpassword")
+        get_user_model().objects.create_user(username="testuser",
+                                             password="testpassword",
+                                             email="test@example.com")
         self.client.login(username="testuser", password="testpassword")
         request = self.client.post(reverse("task_board:team-create"), data, follow=True)
         self.assertEqual(request.status_code, 200)
@@ -480,7 +502,8 @@ class TeamDetailViewTestCase(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(
             username="testuser",
-            password="testpassword"
+            password="testpassword",
+            email="test@example.com"
         )
         self.client.login(username="testuser",
                           password="testpassword")
@@ -490,7 +513,8 @@ class TeamDetailViewTestCase(TestCase):
 
     def test_get_not_in_same_team(self):
         user = get_user_model().objects.create_user(username="testuser1",
-                                                    password="testpassword")
+                                                    password="testpassword",
+                                                    email="test1@example.com")
         TeamWorker.objects.create(team=self.team, worker=user)
         request = self.client.get(reverse(
             "task_board:team-detail", kwargs={"pk": self.team.pk}
@@ -509,7 +533,8 @@ class TeamDetailViewTestCase(TestCase):
 class AddTeamWorkerInTeamViewTestCase(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="testuser",
-                                                         password="testpassword")
+                                                         password="testpassword",
+                                                         email="test@example.com")
         self.client.login(username="testuser", password="testpassword")
         self.team = Team.objects.create(name="testteam")
 
@@ -524,7 +549,8 @@ class AddTeamWorkerInTeamViewTestCase(TestCase):
 
     def test_get_not_in_team(self):
         user = get_user_model().objects.create_user(username="testuser1",
-                                                    password="testpassword")
+                                                    password="testpassword",
+                                                    email="test1@example.com")
         TeamWorker.objects.create(team=self.team, worker=user)
 
         request = self.client.get(reverse(
@@ -563,7 +589,8 @@ class AddTeamWorkerInTeamViewTestCase(TestCase):
 class ChangeTeamWorkerIsStaffPermissionViewTestCase(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="testuser",
-                                                         password="testpassword")
+                                                         password="testpassword",
+                                                         email="test@example.com")
         self.client.login(username="testuser", password="testpassword")
         self.team = Team.objects.create(name="testteam")
 
@@ -578,7 +605,8 @@ class ChangeTeamWorkerIsStaffPermissionViewTestCase(TestCase):
 
     def test_get_not_in_team(self):
         user = get_user_model().objects.create_user(username="testuser1",
-                                                    password="testpassword")
+                                                    password="testpassword",
+                                                    email="tes1t@example.com")
         TeamWorker.objects.create(team=self.team, worker=user)
 
         request = self.client.get(reverse(
@@ -617,7 +645,8 @@ class ChangeTeamWorkerIsStaffPermissionViewTestCase(TestCase):
 class UserDeleteFromTeamViewTestCase(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="testuser",
-                                                         password="testpassword")
+                                                         password="testpassword",
+                                                         email="test@example.com")
         self.client.login(username="testuser", password="testpassword")
         self.team = Team.objects.create(name="testteam")
 
@@ -631,7 +660,8 @@ class UserDeleteFromTeamViewTestCase(TestCase):
 
     def test_get_not_in_team(self):
         user = get_user_model().objects.create_user(username="testuser1",
-                                                    password="testpassword")
+                                                    password="testpassword",
+                                                    email="test1@example.com")
         TeamWorker.objects.create(team=self.team, worker=user)
 
         request = self.client.get(reverse(
@@ -660,7 +690,8 @@ class UserDeleteFromTeamViewTestCase(TestCase):
     def test_delete_with_team_staff_members(self):
         TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
         user = get_user_model().objects.create_user(username="testuser1",
-                                                    password="testpassword")
+                                                    password="testpassword",
+                                                    email="test1@example.com")
         new_team_member = TeamWorker.objects.create(team=self.team,
                                                     worker=user,
                                                     team_staff=True)
@@ -679,7 +710,8 @@ class UserDeleteFromTeamViewTestCase(TestCase):
         TeamWorker.objects.create(team=self.team, worker=self.user, team_owner=True)
         user = get_user_model().objects.create_user(
             username="testuser1",
-            password="testpassword"
+            password="testpassword",
+            email="test1@example.com"
         )
         new_team_member = TeamWorker.objects.create(team=self.team, worker=user)
 

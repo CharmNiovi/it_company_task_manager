@@ -78,14 +78,13 @@ class Task(models.Model):
         D = ("D", "Done")
 
     class PriorityChoices(models.TextChoices):
-        LOW = ("L", "Low Priority")
-        MID = ("M", "Mid Priority")
-        High = ("H", "High Priority")
+        LOW = ("1", "Low Priority")
+        MID = ("2", "Mid Priority")
+        High = ("3", "High Priority")
 
     name = models.CharField(max_length=100)
     description = models.TextField()
     deadline = models.DateTimeField()
-    is_completed = models.BooleanField(default=False)
     priority = models.CharField(max_length=1, choices=PriorityChoices.choices)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="tasks")
     tags = models.ManyToManyField(Tag, related_name="tasks", blank=True)

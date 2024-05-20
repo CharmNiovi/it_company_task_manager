@@ -35,9 +35,11 @@ class RegisterViewTestCase(TestCase):
 class ProfileViewTestCase(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="testuser",
-                                                         password="testpassword")
+                                                         password="testpassword",
+                                                         email="testuser@example.com")
         self.fried = get_user_model().objects.create_user(username="testuser1",
-                                                          password="testpassword1")
+                                                          password="testpassword1",
+                                                          email="testuser1@example.com")
         self.team = Team.objects.create(name="testteam")
 
     def test_self_profile_view_get(self):
@@ -45,18 +47,18 @@ class ProfileViewTestCase(TestCase):
         task1 = Task.objects.create(
             name="testtask",
             deadline=datetime.datetime(2022, 2, 1),
-            project=project
+            project=project,
         )
         task2 = Task.objects.create(
             name="testtask1",
             deadline=datetime.datetime(2022, 1, 1),
-            project=project
+            project=project,
         )
         task3 = Task.objects.create(
             name="testtask2",
             deadline=datetime.datetime(2022, 2, 1),
             project=project,
-            is_completed=True
+            status="D"
         )
         task1.assignees.add(self.user)
         task2.assignees.add(self.user)
