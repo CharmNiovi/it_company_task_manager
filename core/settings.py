@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    "crispy_forms",
+
     "accounts.apps.AccountsConfig",
     "task_board.apps.TaskBoardConfig",
 ]
@@ -133,6 +135,9 @@ MEDIA_URL = "/media/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.Worker"
+
+# CRISPY
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 if DEBUG:
     INSTALLED_APPS += ["debug_toolbar"]
