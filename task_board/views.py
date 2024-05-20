@@ -182,7 +182,9 @@ class TeamDetailView(LoginRequiredMixin, UserInTeamTeamRequiredMixin, generic.De
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["team_workers"] = TeamWorker.objects.filter(team=context["object"])
+        context["team_workers"] = TeamWorker.objects.filter(
+            team=context["object"]
+        ).select_related("worker", "worker__position")
         context["is_owner"] = context["team_workers"].get(
             team=context["object"],
             worker=self.request.user

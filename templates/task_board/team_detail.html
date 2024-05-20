@@ -1,27 +1,53 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>{{ object.name }}</h2>
-  {% if is_owner %}
-    <a href="{% url 'task_board:add-team-worker-in-team' object.pk %}">
-      <button>Add user</button>
-    </a>
-  {% endif %}
-  {% for team_worker in team_workers %}
-    <p>
-      {{ team_worker.worker.username }}
-      {% if team_worker.team_owner %}
-        (owner)
-      {% elif team_worker.team_staff %}
-        (staff)
-      {% endif %}
-      {% if is_owner %}
-        <a href="{% url 'task_board:change-team-worker-permission' object.pk team_worker.worker.username %}">
-          <button>Change</button>
-        </a>
-        <a href="{% url 'task_board:delete-user-from-team' object.pk team_worker.worker.username %}">
-          <button>Delete</button>
-        </a>
-      {% endif %}
-    </p>
-  {% endfor %}
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <div class="bg-white py-24 sm:py-32">
+    <div class="mx-auto grid max-w-7xl gap-x-8 gap-y-20 px-6 lg:px-8 xl:grid-cols-3">
+      <div class="max-w-2xl">
+        <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Meet our {{ object.name }} team
+          members</h2>
+        {% if is_owner %}
+          <a href="{% url 'task_board:add-team-worker-in-team' object.pk %}">
+            <button class="btn btn-primary">Add user</button>
+          </a>
+        {% endif %}
+      </div>
+      <ul role="list" class="grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2">
+        {% for team_worker in team_workers %}
+          <li>
+            <div class="flex items-center gap-x-6">
+              <img class="h-16 w-16 rounded-full"
+                      {% if team_worker.worker.profile_picture %}
+                   src="{{ team_worker.worker.profile_picture.url }}"
+                      {% endif %}
+                   alt="">
+              <div>
+                <h3 class="text-base font-semibold leading-7 tracking-tight text-gray-900">
+                  <a href="{% url 'accounts:profile-detail' team_worker.worker.username %}">
+                    {{ team_worker.worker.username }}
+                  </a>
+                </h3>
+                <p class="text-sm font-semibold leading-6 text-indigo-600">{{ team_worker.worker.position }}
+                  {% if team_worker.team_owner %}
+                    / team owner
+                  {% elif team_worker.team_staff %}
+                    / team staff
+                  {% endif %}
+                </p>
+                {% if is_owner %}
+                  <a href="{% url 'task_board:change-team-worker-permission' object.pk team_worker.worker.username %}">
+                    <button class="btn btn-primary">Change</button>
+                  </a>
+                  <a href="{% url 'task_board:delete-user-from-team' object.pk team_worker.worker.username %}">
+                    <button class="btn btn-dangeon">Delete</button>
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 {% endblock %}
+
