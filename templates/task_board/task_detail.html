@@ -32,7 +32,10 @@
         {% endfor %}
       </ul>
       </p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
+      {% if is_owner or is_team_staff %}
+        <a href="{% url 'task_board:task-update' object.project.pk task.pk %}" class="btn btn-primary">Update</a>
+        <a href="{% url 'task_board:task-delete' object.project.pk task.pk %}" class="btn btn-danger">Delete</a>
+      {% endif %}
     </div>
   </div>
 {% endblock %}
