@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
@@ -20,10 +20,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-uun)e$vy0o6+ksde-%8&jk0t$z(#(sv=_d!cj#5+%vcgeb*fzd"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don"t run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = []
 
@@ -141,6 +141,5 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 if DEBUG:
     INSTALLED_APPS += ["debug_toolbar"]
-    INSTALLED_APPS += ['django_extensions']
     MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
     INTERNAL_IPS = ["127.0.0.1"]
