@@ -1,26 +1,38 @@
 {% extends 'base.html' %}
 {% block content %}
-  <p>{{ object.name }}</p>
-  <p>{{ object.description }}</p>
-  <p>{{ object.deadline }}</p>
-  <p>{{ object.is_completed }}</p>
-  <p>{{ object.priority }}</p>
-  <p>{{ object.task_type.name }}</p>
-  <p>{{ object.get_status_display }}</p>
-  {% for assign_user in object.assignees.all %}
-    <p>{{ assign_user.username }}</p>
-  {% endfor %}
-  <ul>
-    {% for tag in object.tags.all %}
-      <li>{{ tag }}</li>
-    {% endfor %}
-  </ul>
-  {% if is_staff or is_owner %}
-    <a href="{% url 'task_board:task-update' object.project.pk object.pk %}">
-      <button>Upd</button>
-    </a>
-    <a href="{% url 'task_board:task-delete' object.project.pk object.pk %}">
-      <button>Del</button>
-    </a>
-  {% endif %}
+  <div class="card">
+    <div class="card-header">
+      Task detail
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">
+        {{ object.name }} from
+        <a href="{% url 'task_board:project-detail' object.project.pk %}">
+          {{ object.project }}
+        </a>
+      </h5>
+      <p class="card-text">{{ object.description }}</p>
+      <p class="card-text">{{ object.deadline }}</p>
+      <p class="card-text">{{ object.get_priority_display }}</p>
+      <p class="card-text">{{ object.get_status_display }}</p>
+      <p class="card-text">{{ object.task_type }}</p>
+      <p class="card-text">
+        Tags:
+      <ul>
+        {% for tag in object.tags.all %}
+          <li>{{ tag.name }}</li>
+        {% endfor %}
+      </ul>
+      </p>
+      <p class="card-text">
+        Assignees:
+      <ul>
+        {% for assign in object.assignees.all %}
+          <li><a href="{% url 'accounts:profile-detail' assign.username %}">{{ assign.username }}</a></li>
+        {% endfor %}
+      </ul>
+      </p>
+      <a href="#" class="btn btn-primary">Go somewhere</a>
+    </div>
+  </div>
 {% endblock %}
