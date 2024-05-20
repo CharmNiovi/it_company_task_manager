@@ -26,11 +26,11 @@
           <div class="card">
             <div class="card-body">
               <div class="d-flex flex-column align-items-center text-center">
-                <img 
+                <img
                         {% if object.profile_picture %}
-                        src="{{ object.profile_picture.url }}"
+                          src="{{ object.profile_picture.url }}"
                         {% endif %}
-                        alt="Admin" class="rounded-circle" width="150">
+                          alt="Admin" class="rounded-circle" width="150">
                 <div class="mt-3">
                   <h4>{{ object.username }}</h4>
                   <p class="text-secondary mb-1">{{ object.position }}</p>
@@ -79,14 +79,14 @@
                 <div class="col-sm-6 mb-3">
                   <div class="card h-100">
                     <div class="card-body">
-                      <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">assignment</i>{{ task.name }}</h6>
-                      <small>Task name: {{ task.name }}</small>
-                      <div class="progress" style="height: 5px">
-                      </div>
+                      <h6 class="d-flex align-items-center mb-3"><i
+                              class="material-icons text-info mr-2">assignment </i><a
+                              href="{% url 'task_board:task-detail' task.project.pk task.pk %}">{{ task.name }}</a></h6>
                       <small>Task deadline: {{ task.deadline }}</small>
                       <div class="progress mb-3" style="height: 5px">
                       </div>
-                      <small>From <a href="{% url 'task_board:project-detail' task.project.pk %}">{{ task.project.name }}</a></small>
+                      <small>From <a
+                              href="{% url 'task_board:project-detail' task.project.pk %}">{{ task.project.name }}</a></small>
                       <div class="progress mb-3" style="height: 5px">
                       </div>
                       <small>Type: {{ task.task_type.name }}</small>
