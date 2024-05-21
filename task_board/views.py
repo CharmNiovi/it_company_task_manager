@@ -79,6 +79,11 @@ class TaskCreateView(LoginRequiredMixin, TeamStaffOrOwnerRequiredMixin, generic.
     form_class = TaskForm
     template_name = "task_board/task_form.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["project_pk"] = self.kwargs["pk"]
+        return context
+
     def form_valid(self, form):
         form.instance.project = get_object_or_404(Project, pk=self.kwargs["pk"])
         form.instance.status = "IP" if form.cleaned_data.get("assignees") else "UA"
@@ -204,7 +209,7 @@ class AddTeamWorkerInTeamView(LoginRequiredMixin,
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["object"] = get_object_or_404(
-            Team.objects.values("name"),
+            Team.objects.values("name", "pk"),
             pk=self.kwargs["pk"]
         )
         return context
