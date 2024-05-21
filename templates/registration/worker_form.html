@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
   {% load crispy_forms_filters %}
-	<form method="post">
-  {% csrf_token %}
-  {{ form|crispy }}
-  <input type="submit" value="accept">
+	<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <input type="submit" value="Accept">
   </form>
 {% endblock %}
+
