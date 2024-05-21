@@ -4,5 +4,6 @@
   <form method="post">
   {% csrf_token %}
   <input type="submit" value="accept" class="btn btn-danger">
+  <a class="btn btn-primary" href="{% url 'task_board:team-detail' object.team.pk %}">Cancel</a>
   </form>
 {% endblock %}
