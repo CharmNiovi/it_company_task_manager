@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import get_user_model
 
 from task_board.models import Project, Task, Team
 
@@ -17,6 +18,12 @@ class ProjectForm(forms.ModelForm):
 
 
 class TaskForm(forms.ModelForm):
+    def __init__(self, project_pk, *args, **kwargs):
+        super(TaskForm, self).__init__(*args, **kwargs)
+        self.fields["assignees"].queryset = get_user_model().objects.filter(
+            team_workers__team__projects__pk=project_pk
+        )
+
     class Meta:
         model = Task
         fields = [
