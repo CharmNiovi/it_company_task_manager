@@ -11,7 +11,7 @@
   <p>Please login to see this page.</p>
 {% endif %}
 {% load crispy_forms_filters %}
-<form method="post" action="{% url 'login' %}">
+<form method="post">
   {% csrf_token %}
   {{ form|crispy }}
 
