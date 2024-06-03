@@ -30,7 +30,7 @@ If a port or network is busy, you can change it by example:
 ./manage.py runserver 0.0.0.0:80
 ```
 
-If you need a super user, then:
+If you need a superuser, then:
 ```shell
 ./manage.py createsuperuser
 ```
@@ -38,6 +38,11 @@ If you need a super user, then:
 ## Developing
 
 To develop in debug mode, you need to specify `DEBUG=False` in `.env`
+
+To test app run:
+```shell
+./manage.py test
+```
 
 ## Features
 
