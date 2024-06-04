@@ -71,10 +71,9 @@ use the functionality branch. We warmly welcome pull requests.
 ## Links
 
 
-- Project homepage: https://it-company-task-manager-v9l3.onrender.com/
 - Repository: https://github.com/CharmNiovi/it_company_task_manager
 - Issue tracker: https://github.com/CharmNiovi/it_company_task_manager/issues
-
+- Project homepage: https://it-company-task-manager-v9l3.onrender.com/ (Test user: username=TestUser, password=qwe123QWE!@#)
 
 ## Licensing
 
