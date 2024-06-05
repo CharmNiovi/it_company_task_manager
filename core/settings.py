@@ -129,6 +129,8 @@ USE_TZ = True
 
 STATICFILES_DIRS = (BASE_DIR / "static",)
 
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -144,9 +146,6 @@ if DEBUG:
     INSTALLED_APPS += ["debug_toolbar"]
     MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
     INTERNAL_IPS = ["127.0.0.1"]
-
-    STATIC_URL = "static/"
-    STATIC_ROOT = BASE_DIR / "staticfiles"
 
     MEDIA_ROOT = BASE_DIR / "media"
     MEDIA_URL = "/media/"
