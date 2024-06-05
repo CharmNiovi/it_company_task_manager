@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+  {% load crispy_forms_filters %}
+  <h1>Change {{ object.name }} permissions</h1>
+  <form method="post">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <input type="submit" class="btn btn-primary">
+  <a class="btn btn-primary" href="{% url 'task_board:team-detail' object.team.pk %}">Cancel</a>
+  </form>
+{% endblock %}

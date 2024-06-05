@@ -1,0 +1,20 @@
+<ul class="sidebar-nav list-group">
+  {% if user.is_authenticated %}
+
+    <li class="list-group-item">User: <a href="{% url 'accounts:profile-detail' user.get_username %}">
+      {% if user.profile_picture %}
+      <img src="{{ user.profile_picture.url }}" width="50" height="50"> 
+        {% endif %}
+    {{ user.get_username }}
+    </a></li>
+    <li class="list-group-item"><a href="{% url 'accounts:logout'%}?next={{request.path}}">Logout</a></li>
+  {% else %}
+    <li class="list-group-item"><a href="{% url 'accounts:login'%}?next={{request.path}}">Login</a></li>
+    <li class="list-group-item"><a href="{% url 'accounts:register'%}?next={{request.path}}">Sign-up</a></li>
+  {% endif %}
+
+  <br>
+
+  <li class="list-group-item"><a href="{% url 'task_board:project-list' %}">Projects</a></li>
+  <li class="list-group-item"><a href="{% url 'task_board:team-list' %}">Teams</a></li>
+</ul>

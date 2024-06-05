@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      Task detail
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">
+        {{ object.name }} from
+        <a href="{% url 'task_board:project-detail' object.project.pk %}">
+          {{ object.project }}
+        </a>
+      </h5>
+      <p class="card-text">{{ object.description }}</p>
+      <p class="card-text">{{ object.deadline }}</p>
+      <p class="card-text">{{ object.get_priority_display }}</p>
+      <p class="card-text">{{ object.get_status_display }}</p>
+      <p class="card-text">{{ object.task_type }}</p>
+      <p class="card-text">
+        Tags:
+      <ul>
+        {% for tag in object.tags.all %}
+          <li>{{ tag.name }}</li>
+        {% endfor %}
+      </ul>
+      </p>
+      <p class="card-text">
+        Assignees:
+      <ul>
+        {% for assign in object.assignees.all %}
+          <li><a href="{% url 'accounts:profile-detail' assign.username %}">{{ assign.username }}</a></li>
+        {% endfor %}
+      </ul>
+      </p>
+      {% if is_owner or is_team_staff %}
+        <a href="{% url 'task_board:task-update' object.project.pk task.pk %}" class="btn btn-primary">Update</a>
+        <a href="{% url 'task_board:task-delete' object.project.pk task.pk %}" class="btn btn-danger">Delete</a>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

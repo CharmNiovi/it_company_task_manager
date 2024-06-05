@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block content %}
+  <style>
+
+      .card {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+          word-wrap: break-word;
+          background-color: #fff;
+          background-clip: border-box;
+          border: 0 solid rgba(0, 0, 0, .125);
+          border-radius: .25rem;
+      }
+
+      .gutters-sm > .col, .gutters-sm > [class*=col-] {
+          padding-right: 8px;
+          padding-left: 8px;
+      }
+  </style>
+  <div class="container">
+    <div class="main-body">
+      <div class="row gutters-sm">
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex flex-column align-items-center text-center">
+                <img
+                        {% if object.profile_picture %}
+                          src="{{ object.profile_picture.url }}"
+                        {% endif %}
+                          alt="" class="rounded-circle" width="150">
+                <div class="mt-3">
+                  <h4>{{ object.username }}</h4>
+                  <p class="text-secondary mb-1">{{ object.position }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-sm-3">
+                  <h6 class="mb-0">Full Name</h6>
+                </div>
+                <div class="col-sm-9 text-secondary">
+                  {{ object.first_name }} {{ object.last_name }}
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <h6 class="mb-0">Email</h6>
+                </div>
+                <div class="col-sm-9 text-secondary">
+                  {{ object.email }}
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-12">
+                  {% if user == object %}
+                    <a href="{% url 'accounts:profile-update' %}">
+                      <button class="btn btn-info ">Edit</button>
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row gutters-sm">
+            {% if user == object %}
+              {% for task in tasks %}
+
+                <div class="col-sm-6 mb-3">
+                  <div class="card h-100">
+                    <div class="card-body">
+                      <h6 class="d-flex align-items-center mb-3"><i
+                              class="material-icons text-info mr-2">assignment </i><a
+                              href="{% url 'task_board:task-detail' task.project.pk task.pk %}">{{ task.name }}</a></h6>
+                      <small>Task deadline: {{ task.deadline }}</small>
+                      <div class="progress mb-3" style="height: 5px">
+                      </div>
+                      <small>From <a
+                              href="{% url 'task_board:project-detail' task.project.pk %}">{{ task.project.name }}</a></small>
+                      <div class="progress mb-3" style="height: 5px">
+                      </div>
+                      <small>Type: {{ task.task_type.name }}</small>
+                      <div class="progress mb-3" style="height: 5px">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              {% endfor %}
+            {% endif %}
+
+          </div>
+
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+{% endblock %}

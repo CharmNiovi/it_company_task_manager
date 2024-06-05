@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+  <a href="{% url 'task_board:project-create' %}">
+    <button class="btn btn-primary mt-2 mb-3">Create new project</button>
+  </a>
+  {% for project in object_list %}
+    <p>
+      <a href="{% url 'task_board:project-detail' project.id %}">{{ project.name }}</a>
+      by {{ project.team.name }}
+    </p>
+  {% endfor %}
+{% endblock %}

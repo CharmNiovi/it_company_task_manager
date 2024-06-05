@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+  {% load crispy_forms_filters %}
+  <h1>{{ object|yesno:"Add in,Create" }} team {{ object.name }}</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <input type="submit" class="btn btn-primary">
+    {% if object %}
+      <a class="btn btn-primary" href="{% url 'task_board:team-detail' object.pk %}">Cancel</a>
+    {% else %}
+      <a class="btn btn-primary" href="{% url 'task_board:team-list' %}">Cancel</a>
+    {% endif %}
+  </form>
+{% endblock %}
